@@ -1,10 +1,10 @@
-// #define SDL_MAIN_HANDLED // TODO: test on windows!
 #include <glad/gl.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
-
 #include <vector>
 #include <iostream>
+#include "utils.hpp"
+#include "shaders.hpp"
 
 void do_stuff() {
 
@@ -118,7 +118,6 @@ void do_stuff() {
 }
 
 void do_stuff_indexed() {
-
     // some setup for the render pipeline
     glViewport(0, 0, 500, 500); // set viewport size
     glClearColor(.5f, .5f, .5f, 1.0f); // default screen color
@@ -163,17 +162,8 @@ void do_stuff_indexed() {
     // enable the "pos" attribute
     glEnableVertexArrayAttrib(vao, i);
 
-    // creating our shader stages
-    // very cursed for now
-    const GLchar* vertexShaderString = 
-        "#version 460 core\n"
-        "layout (location = 0) in vec3 pos;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
-        "}\0";
-
-    // and now we compile it at runtime
+    // compile shader at runtime
+    const GLchar* vertexShaderString = read_shader("default.vs");
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderString, nullptr);
     glCompileShader(vertexShader);
@@ -188,14 +178,7 @@ void do_stuff_indexed() {
     }
 
     // now we do the same for pixel/fragment shader
-    const GLchar* fragmentShaderString = 
-        "#version 460 core\n"
-        "out vec4 color;\n"
-        "void main()\n"
-        "{\n"
-        "   color = vec4(0.7f, 0.1f, 0.1f, 1.0f);\n"
-        "}\0";
-    
+    const GLchar* fragmentShaderString = read_shader("default.fs");
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderString, nullptr);
     glCompileShader(fragmentShader);
@@ -231,17 +214,6 @@ void do_stuff_indexed() {
     glDeleteProgram(shaderProgram);
 }
 
-static void openglCallbackFunction(
-    GLenum source, GLenum type, GLuint id, 
-    GLenum severity,  GLsizei length,
-    const GLchar* message, const void* userParam) {
-    fprintf(stderr, "%s\n", message);
-    if (severity==GL_DEBUG_SEVERITY_HIGH) {
-        fprintf(stderr, "Aborting...\n");
-        abort();
-    }
-}
-
 int main() {
     if (SDL_InitSubSystem(SDL_InitFlags::SDL_INIT_VIDEO)) {
         SDL_Log(SDL_GetError(), "");
@@ -257,7 +229,7 @@ int main() {
 
     #ifndef NDEBUG
     // only enable explicit logging in debug mode
-    // SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_FLAGS, SDL_GLcontextFlag::SDL_GL_CONTEXT_DEBUG_FLAG);
+    SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_FLAGS, SDL_GLcontextFlag::SDL_GL_CONTEXT_DEBUG_FLAG);
     #endif
 
     // create OpenGL window
@@ -284,10 +256,10 @@ int main() {
 
     #ifndef NDEBUG
     // only enable explicit logging in debug mode
-    // glEnable(GL_DEBUG_OUTPUT);
-    // glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    // glDebugMessageCallback(openglCallbackFunction, nullptr);
-    // glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(openglCallbackFunction, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
     #endif
 
     bool bRunning = true;
