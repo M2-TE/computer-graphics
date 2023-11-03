@@ -29,7 +29,7 @@ struct App {
             }
             
             // draw wireframe while holding f
-            if (input.get_key(SDL_KeyCode::SDLK_f)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            if (input.get_key_down(SDL_KeyCode::SDLK_f)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             glClear(GL_COLOR_BUFFER_BIT);

@@ -52,7 +52,7 @@ public:
 	}
 
     // query key and button inputs using find(), which returns the end() iterator if it wasnt found
-    bool get_key(SDL_Keycode key) { // is key being held down
+    bool get_key_down(SDL_Keycode key) { // is key being held down
         return keysDown.find(key) != keysDown.end();
     }
     bool get_key_pressed(SDL_Keycode key) { // was key pressed this frame
@@ -62,7 +62,7 @@ public:
         return keysReleased.find(key) != keysReleased.end();
     }
 
-    bool get_button(uint8_t button) { // is mouse button being held down
+    bool get_button_down(uint8_t button) { // is mouse button being held down
         return mouseButtonsDown.find(button) != mouseButtonsDown.end();
     }
     bool get_button_pressed(uint8_t button) { // was mouse button pressed this frame
