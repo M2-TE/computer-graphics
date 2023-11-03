@@ -17,10 +17,9 @@
 struct App {
     int run() {
         while(bRunning) {
-            // flush input
+            // flush input from last frame
             input.flush();
             
-            // handle all the window events
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
                 if (event.type == SDL_EventType::SDL_EVENT_QUIT) bRunning = false;
@@ -32,6 +31,7 @@ struct App {
             if (input.get_key_down(SDL_KeyCode::SDLK_f)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+            // clear screen, bind render pipeline and draw mesh to it
             glClear(GL_COLOR_BUFFER_BIT);
             pipeline.bind();
             mesh.draw();
