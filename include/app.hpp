@@ -1,6 +1,6 @@
 #pragma once
 
-// external libraries
+// External libraries
 #include <glad/gl.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
