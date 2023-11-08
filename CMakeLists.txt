@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(sdl3)
 FetchContent_Declare(glad GIT_REPOSITORY "https://github.com/Dav1dde/glad.git" GIT_TAG "glad2")
 FetchContent_Populate(glad)
 add_subdirectory("${glad_SOURCE_DIR}/cmake")
-glad_add_library(GLAD SHARED API gl:core=4.6)
+glad_add_library(GLAD STATIC API gl:core=4.6)
 
 # GLM
 FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_TAG "master")
@@ -40,7 +40,7 @@ target_sources(${PROJECT_NAME} PRIVATE "src/main.cpp")
 target_include_directories(${PROJECT_NAME} PRIVATE "include/")
 
 # link libraries to executable
-target_link_libraries(${PROJECT_NAME} SDL3-shared)
+target_link_libraries(${PROJECT_NAME} SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL)
 target_link_libraries(${PROJECT_NAME} GLAD)
 target_link_libraries(${PROJECT_NAME} glm)

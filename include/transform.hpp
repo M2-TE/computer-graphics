@@ -5,14 +5,7 @@
 #include <glm/gtc/type_ptr.hpp> // allows use of glm::value_ptr to get raw pointer to data
 
 struct Transform {
-    Transform() {
-        position = { 0.0f, 0.0f, 0.0f };
-        rotation = { 0.0f, 0.0f, 0.0f };
-        scale = { 1.0f, 1.0f, 1.0f };
-    }
-
     void bind() {
-        // apply scale first
         glm::mat4x4 modelMatrix(1.0f); // set matrix to identity
 
         // another way to apply rotation
@@ -27,7 +20,7 @@ struct Transform {
         glUniformMatrix4fv(0, 1, false, glm::value_ptr(modelMatrix));
     }
 
-    glm::vec3 position;
-    glm::vec3 rotation; // euler rotation
-    glm::vec3 scale;
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f); // euler
+    glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
 };

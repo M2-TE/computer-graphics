@@ -37,6 +37,8 @@ struct Window {
 
         glViewport(0, 0, width, height); // set viewport size
         glClearColor(.5f, .5f, .5f, 1.0f); // default screen color
+        SDL_SetRelativeMouseMode(SDL_TRUE); // capture mouse for better camera controls
+        SDL_GL_SetSwapInterval(1); // vsync
     }
     ~Window() {
         SDL_Quit();

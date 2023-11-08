@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include "transform.hpp"
 
 struct Mesh {
@@ -53,14 +52,6 @@ struct Mesh {
     }        
 
     void draw() {
-        float time = (float)SDL_GetPerformanceCounter();
-        float color = std::sin(time * 0.000000001f);
-
-        transform.position.x = std::sin(time * 0.000000001f) * 0.5f;
-        transform.position.y = std::cos(time * 0.000000001f) * 0.5f;
-        transform.rotation.z = std::sin(time * 0.000000001f);
-        transform.scale = glm::vec3(1.0f) * std::cos(time * 0.000000001f) * 0.5f + 1.0f;
-
         glBindVertexArray(vao);
         transform.bind();
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
