@@ -35,7 +35,7 @@ struct Window {
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
         #endif
 
-        glViewport(0, 0, 500, 500); // set viewport size
+        glViewport(0, 0, width, height); // set viewport size
         glClearColor(.5f, .5f, .5f, 1.0f); // default screen color
     }
     ~Window() {

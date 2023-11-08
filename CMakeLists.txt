@@ -22,6 +22,10 @@ FetchContent_Populate(glad)
 add_subdirectory("${glad_SOURCE_DIR}/cmake")
 glad_add_library(GLAD SHARED API gl:core=4.6)
 
+# GLM
+FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_TAG "master")
+FetchContent_MakeAvailable(glm)
+
 # CMRC
 FetchContent_Declare(cmrc GIT_REPOSITORY "https://github.com/vector-of-bool/cmrc.git" GIT_TAG "master")
 FetchContent_Populate(cmrc)
@@ -39,4 +43,5 @@ target_include_directories(${PROJECT_NAME} PRIVATE "include/")
 target_link_libraries(${PROJECT_NAME} SDL3-shared)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL)
 target_link_libraries(${PROJECT_NAME} GLAD)
+target_link_libraries(${PROJECT_NAME} glm)
 target_link_libraries(${PROJECT_NAME} shaders)

@@ -1,20 +1,21 @@
 #pragma once
 
+#include <cmath>
+#include "transform.hpp"
+
 struct Mesh {
     Mesh() {
         // from -1.0f to 1.0f in both x and y, depth set to 0
         vertices = {
-            .0f, .0f, .0f,
-            .5f, .0f, .0f,
-            .0f, .5f, .0f,
-            .5f, .5f, .0f,
+            .0f, .0f, .0f, .5f, .0f, .0f,
+            .5f, .0f, .0f, .0f, .5f, .0f,
+            .0f, .5f, .0f, .0f, .0f, .5f,
+            .5f, .5f, .0f, .5f, .5f, .0f,
         };
         indices = {
             0, 2, 1,
             1, 2, 3
         };
-
-        // TODOOOO REORDER THESE STEPS??
 
         // OpenGL buffers will be our handle for GPU memory
         // we cannot interact with it directly like with cpu/system memory
@@ -32,14 +33,18 @@ struct Mesh {
         // this info is stored inside the vao
         vao; // create our vertex array object
         glCreateVertexArrays(1, &vao);
-        GLuint i = 0; // location of "pos" in vertex shader
         // specify buffers
-        glVertexArrayVertexBuffer(vao, 0, vbo, 0, 3 * sizeof(GLfloat));
+        glVertexArrayVertexBuffer(vao, 0, vbo, 0, 6 * sizeof(GLfloat));
         glVertexArrayElementBuffer(vao, ebo);
         // specify vertex format
-        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(vao, i, 0);
-        // enable the "pos" attribute
+        GLuint binding = 0;
+        GLuint i = 0; // position
+        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 0); // position
+        glVertexArrayAttribBinding(vao, i, binding); // position
+        glEnableVertexArrayAttrib(vao, i);
+        i = 1; // color
+        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat)); // color
+        glVertexArrayAttribBinding(vao, i, binding); // color
         glEnableVertexArrayAttrib(vao, i);
     }
     ~Mesh() {
@@ -48,9 +53,21 @@ struct Mesh {
     }        
 
     void draw() {
+        float time = (float)SDL_GetPerformanceCounter();
+        float color = std::sin(time * 0.000000001f);
+
+        transform.position.x = std::sin(time * 0.000000001f) * 0.5f;
+        transform.position.y = std::cos(time * 0.000000001f) * 0.5f;
+        transform.rotation.z = std::sin(time * 0.000000001f);
+        transform.scale = glm::vec3(1.0f) * std::cos(time * 0.000000001f) * 0.5f + 1.0f;
+
         glBindVertexArray(vao);
+        transform.bind();
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
     }
+
+public:
+    Transform transform;
 
 private:
     GLuint vao; // vertex array object
