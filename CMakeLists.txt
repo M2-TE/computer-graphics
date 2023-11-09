@@ -26,13 +26,23 @@ glad_add_library(GLAD STATIC API gl:core=4.6)
 FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_TAG "master")
 FetchContent_MakeAvailable(glm)
 
+# STB
+FetchContent_Declare(stb GIT_REPOSITORY "https://github.com/M2-TE/stb_image.git" GIT_TAG "master")
+FetchContent_MakeAvailable(stb)
+
 # CMRC
 FetchContent_Declare(cmrc GIT_REPOSITORY "https://github.com/vector-of-bool/cmrc.git" GIT_TAG "master")
 FetchContent_Populate(cmrc)
 add_subdirectory("${cmrc_SOURCE_DIR}")
+
+# embed shaders into library
 cmrc_add_resource_library(shaders)
-cmrc_add_resources(shaders WHENCE "shaders" "shaders/default.vs")
-cmrc_add_resources(shaders WHENCE "shaders" "shaders/default.fs")
+cmrc_add_resources(shaders "shaders/default.vs")
+cmrc_add_resources(shaders "shaders/default.fs")
+# embed images into library
+cmrc_add_resource_library(images)
+cmrc_add_resources(images "images/bricks.jpg")
+
 
 # create executable target
 add_executable(${PROJECT_NAME})
@@ -44,4 +54,6 @@ target_link_libraries(${PROJECT_NAME} SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL)
 target_link_libraries(${PROJECT_NAME} GLAD)
 target_link_libraries(${PROJECT_NAME} glm)
+target_link_libraries(${PROJECT_NAME} stb-image)
 target_link_libraries(${PROJECT_NAME} shaders)
+target_link_libraries(${PROJECT_NAME} images)

@@ -9,6 +9,14 @@ static inline const char* load_shader(const std::string& path) {
     return file.cbegin();
 }
 
+// simplifies loading of images
+CMRC_DECLARE(images);
+static inline std::pair<const unsigned char*, std::size_t> load_image(const std::string& path) {
+    auto fs = cmrc::images::get_filesystem();
+    auto file = fs.open(path);
+    return { reinterpret_cast<const unsigned char*>(file.cbegin()), file.size() };
+}
+
 // reports information about potential OpenGL API misuse
 static void openglCallbackFunction(
     GLenum source, GLenum type, GLuint id, 

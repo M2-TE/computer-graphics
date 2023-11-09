@@ -21,7 +21,7 @@ struct App {
         while(bRunning) {
             input.flush(); // flush input from last frame
             timer.update(); // update delta time
-            std::cout << timer.get_fps() << "fps\n";
+            // std::cout << timer.get_fps() << "fps\n";
             
             SDL_Event event;
             while (SDL_PollEvent(&event)) {
@@ -71,7 +71,7 @@ private:
     Input input;
     Timer timer;
     Window window = Window(1280, 720);
-    Pipeline pipeline = Pipeline("default.vs", "default.fs");
+    Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Camera camera = Camera(70, window.width, window.height, 0.1f, 10.0f);
     Mesh mesh;
     bool bRunning = true;

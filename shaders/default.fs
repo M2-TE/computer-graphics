@@ -2,12 +2,11 @@
 
 // input
 in vec4 vertexColor;
+in vec2 uvCoord;
 // output
 out vec4 pixelColor;
 
-layout (location = 14) uniform vec4 uniformColor; // bound to shader before rendering
-layout (location = 15) uniform vec4 A[2]; // takes up 2 location slots
-layout (location = 17) uniform vec4 B; // since 16 is already in use, allot slot 17
+uniform sampler2D textureSampler;
 
 void main() {
 
@@ -15,5 +14,6 @@ void main() {
 
     // pixelColor = vec4(0.7f, 0.1f, 0.1f, 1.0f);
     // pixelColor = uniformColor;
-    pixelColor = vertexColor;
+    // pixelColor = vertexColor;
+    pixelColor = texture(textureSampler, uvCoord) * vertexColor;
 }
