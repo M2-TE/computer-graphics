@@ -19,20 +19,17 @@ struct Mesh {
 
         // OpenGL buffers will be our handle for GPU memory
         // we cannot interact with it directly like with cpu/system memory
-        vbo; // simply a pointer/ID to our vertex buffer object
-        glCreateBuffers(1, &vbo); // modern OpenGL (4.5+) ..Create.. instead of ..Gen..
+        glCreateBuffers(1, &vbo); // vertex buffer object
         GLsizeiptr nBytes = vertices.size() * sizeof(GLfloat);
         glNamedBufferStorage(vbo, nBytes, vertices.data(), 0);
 
-        ebo; // element buffer object (or: index buffer object)
-        glCreateBuffers(1, &ebo);
+        glCreateBuffers(1, &ebo); // element buffer object (or: index buffer object)
         nBytes = indices.size() * sizeof(GLuint);
         glNamedBufferStorage(ebo, nBytes, indices.data(), 0);
 
         // we need to tell OpenGL how to interpret vertex data
         // this info is stored inside the vao
-        vao; // create our vertex array object
-        glCreateVertexArrays(1, &vao);
+        glCreateVertexArrays(1, &vao); // vertex array object
         // specify buffers
         glVertexArrayVertexBuffer(vao, 0, vbo, 0, 8 * sizeof(GLfloat));
         glVertexArrayElementBuffer(vao, ebo);
