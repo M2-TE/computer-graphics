@@ -35,11 +35,11 @@ FetchContent_Declare(cmrc GIT_REPOSITORY "https://github.com/vector-of-bool/cmrc
 FetchContent_Populate(cmrc)
 add_subdirectory("${cmrc_SOURCE_DIR}")
 
-# embed shaders into library
+# embed shaders into library "images"
 cmrc_add_resource_library(shaders)
 file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*.vs" "shaders/*.fs")
 cmrc_add_resources(shaders "${shader-files}")
-# embed images into library
+# embed images into library "images"
 cmrc_add_resource_library(images)
 file(GLOB_RECURSE image-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "images/*.jpg" "images/*.png")
 cmrc_add_resources(images "${image-files}")

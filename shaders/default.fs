@@ -15,5 +15,6 @@ void main() {
     // pixelColor = vec4(0.7f, 0.1f, 0.1f, 1.0f);
     // pixelColor = uniformColor;
     // pixelColor = vertexColor;
-    pixelColor = texture(textureSampler, uvCoord) * vertexColor;
+    // pixelColor = texture(textureSampler, uvCoord) * vertexColor;
+    pixelColor = texture(textureSampler, uvCoord);
 }

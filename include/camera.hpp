@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp> // https://glm.g-truc.net/0.9.2/api/a00245.html
 #include <glm/gtx/euler_angles.hpp> // https://glm.g-truc.net/0.9.1/api/a00251.html
 #include <glm/gtc/type_ptr.hpp> // allows use of glm::value_ptr to get raw pointer to data
+#include <glm/gtc/quaternion.hpp> // https://glm.g-truc.net/0.9.0/api/a00135.html
 
 struct Camera {
     Camera(float fov, float width, float height, float near, float far) {
