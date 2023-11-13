@@ -22,6 +22,15 @@ FetchContent_Populate(glad)
 add_subdirectory("${glad_SOURCE_DIR}/cmake")
 glad_add_library(GLAD STATIC API gl:core=4.6)
 
+# ASSIMP
+set(BUILD_SHARED_LIBS OFF)
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF)
+set(ASSIMP_BUILD_TESTS OFF)
+set(ASSIMP_INSTALL OFF)
+set(ASSIMP_BUILD_ASSIMP_VIEW OFF)
+FetchContent_Declare(assimp GIT_REPOSITORY "https://github.com/assimp/assimp.git" GIT_TAG "master")
+FetchContent_MakeAvailable(assimp)
+
 # GLM
 FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_TAG "master")
 FetchContent_MakeAvailable(glm)
@@ -35,7 +44,7 @@ FetchContent_Declare(cmrc GIT_REPOSITORY "https://github.com/vector-of-bool/cmrc
 FetchContent_Populate(cmrc)
 add_subdirectory("${cmrc_SOURCE_DIR}")
 
-# embed shaders into library "images"
+# embed shaders into library "shaders"
 cmrc_add_resource_library(shaders)
 file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*.vs" "shaders/*.fs")
 cmrc_add_resources(shaders "${shader-files}")
@@ -43,7 +52,10 @@ cmrc_add_resources(shaders "${shader-files}")
 cmrc_add_resource_library(images)
 file(GLOB_RECURSE image-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "images/*.jpg" "images/*.png")
 cmrc_add_resources(images "${image-files}")
-
+# embed models into library "models"
+cmrc_add_resource_library(models)
+file(GLOB_RECURSE model-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "models/*.glb" "models/*.gltf")
+cmrc_add_resources(models "${model-files}")
 
 # create executable target
 add_executable(${PROJECT_NAME})
@@ -54,7 +66,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE "include/")
 target_link_libraries(${PROJECT_NAME} SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL)
 target_link_libraries(${PROJECT_NAME} GLAD)
+target_link_libraries(${PROJECT_NAME} assimp)
 target_link_libraries(${PROJECT_NAME} glm)
 target_link_libraries(${PROJECT_NAME} stb-image)
-target_link_libraries(${PROJECT_NAME} shaders)
-target_link_libraries(${PROJECT_NAME} images)
+target_link_libraries(${PROJECT_NAME} shaders images models)
