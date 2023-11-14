@@ -25,6 +25,7 @@ glad_add_library(GLAD STATIC API gl:core=4.6)
 # ASSIMP
 set(BUILD_SHARED_LIBS OFF)
 set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF)
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT ON)
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INSTALL OFF)
 set(ASSIMP_BUILD_ASSIMP_VIEW OFF)
@@ -46,20 +47,21 @@ add_subdirectory("${cmrc_SOURCE_DIR}")
 
 # embed shaders into library "shaders"
 cmrc_add_resource_library(shaders)
-file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*.vs" "shaders/*.fs")
+file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*")
 cmrc_add_resources(shaders "${shader-files}")
 # embed images into library "images"
 cmrc_add_resource_library(images)
-file(GLOB_RECURSE image-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "images/*.jpg" "images/*.png")
+file(GLOB_RECURSE image-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "images/*")
 cmrc_add_resources(images "${image-files}")
 # embed models into library "models"
 cmrc_add_resource_library(models)
-file(GLOB_RECURSE model-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "models/*.glb" "models/*.gltf")
+file(GLOB_RECURSE model-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "models/*")
 cmrc_add_resources(models "${model-files}")
 
 # create executable target
 add_executable(${PROJECT_NAME})
-target_sources(${PROJECT_NAME} PRIVATE "src/main.cpp")
+file(GLOB_RECURSE source-files CONFIGURE_DEPENDS "src/*")
+target_sources(${PROJECT_NAME} PRIVATE "${source-files}")
 target_include_directories(${PROJECT_NAME} PRIVATE "include/")
 
 # link libraries to executable
@@ -69,4 +71,4 @@ target_link_libraries(${PROJECT_NAME} GLAD)
 target_link_libraries(${PROJECT_NAME} assimp)
 target_link_libraries(${PROJECT_NAME} glm)
 target_link_libraries(${PROJECT_NAME} stb-image)
-target_link_libraries(${PROJECT_NAME} shaders images models)
+target_link_libraries(${PROJECT_NAME} shaders images models) # CMRC libraries
