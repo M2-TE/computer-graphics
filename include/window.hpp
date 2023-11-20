@@ -38,6 +38,7 @@ struct Window {
         glViewport(0, 0, width, height); // set viewport size
         glClearColor(.5f, .5f, .5f, 1.0f); // default screen color
         glEnable(GL_CULL_FACE); // cull backfaces
+        glEnable(GL_DEPTH_TEST); // enable depth buffer and depth testing
         SDL_SetRelativeMouseMode(SDL_TRUE); // capture mouse for better camera controls
         SDL_GL_SetSwapInterval(1); // vsync
     }

@@ -9,35 +9,35 @@ struct Mesh {
         float n = -0.5f; // for readability
         float p = 0.5f; // for readability
         vertices = {
-            n, n, p, .5f, .0f, .0f, 1.0/3.0, 0.00f, // front
-            p, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f,
-            n, p, p, .0f, .0f, .5f, 1.0/3.0, 0.25f,
-            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f,
+            n, n, p, .5f, .0f, .0f, 1.0/3.0, 0.00f, 0.0f, 0.0f, 1.0f, // front
+            p, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f, 0.0f, 0.0f, 1.0f,
+            n, p, p, .0f, .0f, .5f, 1.0/3.0, 0.25f, 0.0f, 0.0f, 1.0f,
+            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, 0.0f, 0.0f, 1.0f,
 
-            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, // back
-            p, n, n, .0f, .5f, .0f, 2.0/3.0, 0.00f,
-            n, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f,
-            p, p, n, .5f, .5f, .0f, 2.0/3.0, 0.25f,
+            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, 0.0f, 0.0f, -1.0f, // back
+            p, n, n, .0f, .5f, .0f, 2.0/3.0, 0.00f, 0.0f, 0.0f, -1.0f,
+            n, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, 0.0f, 0.0f, -1.0f,
+            p, p, n, .5f, .5f, .0f, 2.0/3.0, 0.25f, 0.0f, 0.0f, -1.0f,
 
-            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, // left
-            n, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f,
-            n, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f,
-            n, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f,
+            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, -1.0f, 0.0f, 0.0f, // left
+            n, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f, -1.0f, 0.0f, 0.0f,
+            n, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, -1.0f, 0.0f, 0.0f,
+            n, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, -1.0f, 0.0f, 0.0f,
 
-            p, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, // right
-            p, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f,
-            p, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f,
-            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f,
+            p, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, 1.0f, 0.0f, 0.0f, // right
+            p, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f, 1.0f, 0.0f, 0.0f,
+            p, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, 1.0f, 0.0f, 0.0f,
+            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, 1.0f, 0.0f, 0.0f,
 
-            n, p, n, .5f, .0f, .0f, 1.0/3.0, 0.50f, // top
-            n, p, p, .0f, .5f, .0f, 2.0/3.0, 0.50f,
-            p, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f,
-            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f,
+            n, p, n, .5f, .0f, .0f, 1.0/3.0, 0.50f, 0.0f, 1.0f, 0.0f, // top
+            n, p, p, .0f, .5f, .0f, 2.0/3.0, 0.50f, 0.0f, 1.0f, 0.0f,
+            p, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, 0.0f, 1.0f, 0.0f,
+            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, 0.0f, 1.0f, 0.0f,
 
-            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.75f, // bottom
-            n, n, p, .0f, .5f, .0f, 2.0/3.0, 0.75f,
-            p, n, n, .0f, .0f, .5f, 1.0/3.0, 1.00f,
-            p, n, p, .5f, .5f, .0f, 2.0/3.0, 1.00f,
+            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.75f, 0.0f, -1.0f, 0.0f, // bottom
+            n, n, p, .0f, .5f, .0f, 2.0/3.0, 0.75f, 0.0f, -1.0f, 0.0f,
+            p, n, n, .0f, .0f, .5f, 1.0/3.0, 1.00f, 0.0f, -1.0f, 0.0f,
+            p, n, p, .5f, .5f, .0f, 2.0/3.0, 1.00f, 0.0f, -1.0f, 0.0f,
         };
         indices = {
             0, 1, 3, 3, 2, 0, // front
@@ -62,22 +62,26 @@ struct Mesh {
         // this info is stored inside the vao
         glCreateVertexArrays(1, &vao); // vertex array object
         // specify buffers
-        glVertexArrayVertexBuffer(vao, 0, vbo, 0, 8 * sizeof(GLfloat));
+        glVertexArrayVertexBuffer(vao, 0, vbo, 0, 11 * sizeof(GLfloat));
         glVertexArrayElementBuffer(vao, ebo);
         // specify vertex format
         GLuint binding = 0;
         GLuint i;
         i = 0; // position
-        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 0); // position
-        glVertexArrayAttribBinding(vao, i, binding); // position
+        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
         i = 1; // color
-        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat)); // color
-        glVertexArrayAttribBinding(vao, i, binding); // color
+        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat));
+        glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
         i = 2; // texture coordinate
-        glVertexArrayAttribFormat(vao, i, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat)); // texture coordinate
-        glVertexArrayAttribBinding(vao, i, binding); // color
+        glVertexArrayAttribFormat(vao, i, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat));
+        glVertexArrayAttribBinding(vao, i, binding);
+        glEnableVertexArrayAttrib(vao, i);
+        i = 3; // normals
+        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat));
+        glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
 
         // load image

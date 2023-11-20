@@ -17,6 +17,11 @@
 #include "camera.hpp"
 
 struct App {
+    App() {
+        meshB.transform.position.z -= 1.5f;
+        meshB.transform.position.x -= 1.2f;
+    }
+
     int run() {
         while(bRunning) {
             input.flush(); // flush input from last frame
@@ -33,10 +38,11 @@ struct App {
             handle_inputs();
 
             // clear screen, bind render pipeline and draw mesh to it
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             pipeline.bind();
             camera.bind();
-            mesh.draw();
+            meshA.draw();
+            meshB.draw();
             SDL_GL_SwapWindow(window.pWindow);
         }
 
@@ -53,7 +59,7 @@ private:
         if (input.get_key_pressed(SDL_KeyCode::SDLK_ESCAPE)) SDL_SetRelativeMouseMode(!SDL_GetRelativeMouseMode());
 
         // camera movement
-        float movementSpeed = timer.get_delta();
+        float movementSpeed = timer.get_delta() * 1.5f;
         if (input.get_key_down(SDL_KeyCode::SDLK_s)) camera.translate(0.0f, 0.0f, movementSpeed);
         if (input.get_key_down(SDL_KeyCode::SDLK_w)) camera.translate(0.0f, 0.0f, -movementSpeed);
         if (input.get_key_down(SDL_KeyCode::SDLK_e)) camera.translate(0.0f, movementSpeed, 0.0f);
@@ -73,6 +79,7 @@ private:
     Window window = Window(1280, 720);
     Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Camera camera = Camera(70, window.width, window.height, 0.1f, 10.0f);
-    Mesh mesh;
+    Mesh meshA;
+    Mesh meshB;
     bool bRunning = true;
 };

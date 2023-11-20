@@ -24,6 +24,7 @@ struct Camera {
         viewMatrix = glm::translate(viewMatrix, -position);
         glUniformMatrix4fv(4, 1, false, glm::value_ptr(viewMatrix));
         glUniformMatrix4fv(8, 1, false, glm::value_ptr(projectionMatrix));
+        glUniform3f(16, position.x, position.y, position.z);
     }
 
     glm::mat4x4 projectionMatrix;

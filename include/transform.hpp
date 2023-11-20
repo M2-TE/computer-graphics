@@ -8,16 +8,17 @@ struct Transform {
     void bind() {
         glm::mat4x4 modelMatrix(1.0f); // set matrix to identity
 
-        // another way to apply rotation
-        // modelMatrix = glm::rotate(modelMatrix, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        // modelMatrix = glm::rotate(modelMatrix, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        // modelMatrix = glm::rotate(modelMatrix, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
+        // calculate model matrix
         modelMatrix = glm::translate(modelMatrix, position);
         modelMatrix *= glm::yawPitchRoll(rotation.x, rotation.y, rotation.z);
         modelMatrix = glm::scale(modelMatrix, scale);
 
+        // calculate normal matrix
+        glm::mat4x4 normalMatrix(1.0f);
+        normalMatrix = glm::transpose(glm::inverse(modelMatrix));
+
         glUniformMatrix4fv(0, 1, false, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(12, 1, false, glm::value_ptr(normalMatrix));
     }
 
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
