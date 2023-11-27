@@ -10,9 +10,9 @@ set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED COMPONENTS)
 
 # SDL3
-set(SDL_SHARED ON)
-set(SDL_STATIC OFF)
-set(SDL_TEST_LIBRARY OFF)
+set(SDL_SHARED ON CACHE BOOL "Build SDL as shared lib" FORCE)
+set(SDL_STATIC OFF CACHE BOOL "Build SDL as static lib" FORCE)
+set(SDL_TEST_LIBRARY OFF CACHE BOOL "Build SDL tests" FORCE)
 FetchContent_Declare(sdl3 GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git" GIT_TAG "main")
 FetchContent_MakeAvailable(sdl3)
 
@@ -23,14 +23,14 @@ add_subdirectory("${glad_SOURCE_DIR}/cmake")
 glad_add_library(GLAD STATIC API gl:core=4.6)
 
 # ASSIMP
-# set(BUILD_SHARED_LIBS OFF)
-# set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF)
-# set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT ON)
-# set(ASSIMP_BUILD_TESTS OFF)
-# set(ASSIMP_INSTALL OFF)
-# set(ASSIMP_BUILD_ASSIMP_VIEW OFF)
-# FetchContent_Declare(assimp GIT_REPOSITORY "https://github.com/assimp/assimp.git" GIT_TAG "master")
-# FetchContent_MakeAvailable(assimp)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build ASSIMP as shared lib" FORCE)
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE BOOL "Build all ASSIMP exporters" FORCE)
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT ON CACHE BOOL "Build all ASSIMP importers" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Build ASSIMP tests" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "Enable ASSIMP install" FORCE)
+set(ASSIMP_BUILD_ASSIMP_VIEW OFF CACHE BOOL "Build ASSIMP viewer" FORCE)
+FetchContent_Declare(assimp GIT_REPOSITORY "https://github.com/assimp/assimp.git" GIT_TAG "master")
+FetchContent_MakeAvailable(assimp)
 
 # GLM
 FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_TAG "master")

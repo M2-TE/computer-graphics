@@ -14,6 +14,7 @@
 #include "input.hpp"
 #include "timer.hpp"
 #include "mesh.hpp"
+#include "model.hpp"
 #include "camera.hpp"
 
 struct App {
