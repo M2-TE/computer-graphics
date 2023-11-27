@@ -74,7 +74,13 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "cstring": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "any": "cpp",
+        "bitset": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

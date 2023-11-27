@@ -17,6 +17,14 @@ static inline std::pair<const unsigned char*, std::size_t> load_image(const std:
     return { reinterpret_cast<const unsigned char*>(file.cbegin()), file.size() };
 }
 
+// simplifies loading of models
+CMRC_DECLARE(models);
+static inline std::pair<const char*, std::size_t> load_model(const std::string& path) {
+    auto fs = cmrc::models::get_filesystem();
+    auto file = fs.open(path);
+    return { file.cbegin(), file.size() };
+}
+
 // reports information about potential OpenGL API misuse
 static void openglCallbackFunction(
     GLenum source, GLenum type, GLuint id, 

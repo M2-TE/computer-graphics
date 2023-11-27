@@ -3,15 +3,14 @@
 // input (location matches vertex shader "out")
 layout (location = 0) in vec3 worldPos;
 layout (location = 1) in vec3 normal;
-layout (location = 2) in vec4 vertexColor;
-layout (location = 3) in vec2 uvCoord;
+layout (location = 2) in vec2 uvCoord;
 // output
 out vec4 pixelColor;
 
 uniform sampler2D textureSampler;
 layout (location = 16) uniform vec3 cameraWorldPos;
 
-// first define custom struct
+// define custom struct
 struct Material {
     vec3 ambient; // first slot
     vec3 diffuse; // second slot
@@ -20,13 +19,7 @@ struct Material {
 };
 
 // Material needs 4 slots, similar to a matrix
-layout (location = 17) uniform Material material = {
-    // we assign these on the cpu side; this is just for clarification:
-    vec3(0.1), // 17
-    vec3(1.0), // 18
-    vec3(1.0), // 19
-    32.0 // 20
-};
+layout (location = 17) uniform Material material;
 
 void main() {
     // create our "sun"

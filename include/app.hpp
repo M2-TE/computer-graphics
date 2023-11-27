@@ -13,14 +13,12 @@
 #include "pipeline.hpp"
 #include "input.hpp"
 #include "timer.hpp"
-#include "mesh.hpp"
-#include "model.hpp"
-#include "camera.hpp"
+#include "game_objects/model.hpp"
+#include "game_objects/camera.hpp"
 
 struct App {
     App() {
-        meshB.transform.position.z -= 1.5f;
-        meshB.transform.position.x -= 1.2f;
+        
     }
 
     int run() {
@@ -38,12 +36,16 @@ struct App {
 
             handle_inputs();
 
-            // clear screen, bind render pipeline and draw mesh to it
+            // clear screen (color and depth), bind render pipeline and draw mesh to it
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             pipeline.bind();
             camera.bind();
-            meshA.draw();
-            meshB.draw();
+            
+            // now draw all the models
+            model.draw();
+            // ...
+            // ...
+
             SDL_GL_SwapWindow(window.pWindow);
         }
 
@@ -78,9 +80,8 @@ private:
     Input input;
     Timer timer;
     Window window = Window(1280, 720);
-    Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Camera camera = Camera(70, window.width, window.height, 0.1f, 10.0f);
-    Mesh meshA;
-    Mesh meshB;
+    Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
+    Model model = Model("models/dino.fbx");
     bool bRunning = true;
 };
