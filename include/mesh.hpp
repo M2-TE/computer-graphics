@@ -2,6 +2,7 @@
 
 #include <stb_image.h>
 #include "transform.hpp"
+#include "material.hpp"
 
 struct Mesh {
     Mesh() {
@@ -106,6 +107,7 @@ struct Mesh {
 
     void draw() {
         transform.bind();
+        material.bind();
         glBindVertexArray(vao);
         glBindTextureUnit(0, texture);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
@@ -113,6 +115,7 @@ struct Mesh {
 
 public:
     Transform transform;
+    Material material;
 
 private:
     GLuint texture; // texture buffer

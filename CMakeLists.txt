@@ -63,6 +63,7 @@ add_executable(${PROJECT_NAME})
 file(GLOB_RECURSE source-files CONFIGURE_DEPENDS "src/*")
 target_sources(${PROJECT_NAME} PRIVATE "${source-files}")
 target_include_directories(${PROJECT_NAME} PRIVATE "include/")
+target_include_directories(${PROJECT_NAME} PRIVATE "build/gladsources/GLAD/include/")
 
 # link libraries to executable
 target_link_libraries(${PROJECT_NAME} SDL3::SDL3)

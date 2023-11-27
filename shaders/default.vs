@@ -18,12 +18,12 @@ layout (location = 12) uniform mat4 normalMatrix;       // locations:  12, 13, 1
 
 void main() {
     // gl_Position is a predefined vertex shader output
-    gl_Position = modelMatrix * vec4(pos, 1.0f);
+    gl_Position = modelMatrix * vec4(pos, 1.0);
     worldPos = gl_Position.xyz;
     gl_Position = viewMatrix * gl_Position;
     gl_Position = perspectiveMatrix * gl_Position;
 
     normal = mat3(normalMatrix) * norm; // we do not want to translate/scale the normal
-    vertexColor = vec4(col.xyz, 1.0f);
+    vertexColor = vec4(col.xyz, 1.0);
     uvCoord = uv;
 }

@@ -21,31 +21,32 @@ struct Material {
 
 // Material needs 4 slots, similar to a matrix
 layout (location = 17) uniform Material material = {
-    vec3(0.1f),
-    vec3(1.0f),
-    vec3(1.0f),
-    32.0f
+    // we assign these on the cpu side; this is just for clarification:
+    vec3(0.1), // 17
+    vec3(1.0), // 18
+    vec3(1.0), // 19
+    32.0 // 20
 };
 
 void main() {
     // create our "sun"
-    vec3 lightColor = vec3(.992f, .984f, .827f);
-    vec3 lightWorldPos = vec3(1.5f, 4.0f, 3.0f);
+    vec3 lightColor = vec3(.992, .984, .827);
+    vec3 lightWorldPos = vec3(1.5, 4.0, 3.0);
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
 
     // ambient color (low light from scattered sunlight)
-    float ambientStrength = 1.0f; // ambient modifier
+    float ambientStrength = 1.0; // ambient modifier
     vec3 ambientColor = lightColor * ambientStrength * material.ambient;
 
     // light color
     float diffuseStrength = dot(normal, lightDir); // calc intensity of light
-    diffuseStrength = max(diffuseStrength, 0.0f); // filter out negative intensity
+    diffuseStrength = max(diffuseStrength, 0.0); // filter out negative intensity
     vec3 diffuseColor = lightColor * diffuseStrength * material.diffuse;
 
     // specular color
     vec3 cameraDir = normalize(cameraWorldPos - worldPos); // unit vector from camera to fragment
     vec3 reflectDir = reflect(-lightDir, normal);
-    float specularStrength = 0.5f; // specular modifier
+    float specularStrength = 0.5; // specular modifier
     specularStrength *= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
     vec3 specularColor = lightColor * specularStrength * material.specular;
 
@@ -54,5 +55,5 @@ void main() {
     color = color * (ambientColor + diffuseColor + specularColor); // combine light colors
 
     // write to screen
-    pixelColor = vec4(color, 1.0f);
+    pixelColor = vec4(color, 1.0);
 }
