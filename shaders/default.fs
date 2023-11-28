@@ -7,7 +7,6 @@ layout (location = 2) in vec2 uvCoord;
 // output
 out vec4 pixelColor;
 
-uniform sampler2D textureSampler;
 layout (location = 16) uniform vec3 cameraWorldPos;
 
 // define custom struct
@@ -20,11 +19,13 @@ struct Material {
 
 // Material needs 4 slots, similar to a matrix
 layout (location = 17) uniform Material material;
+uniform sampler2D diffuseTexture;
 
 void main() {
+
     // create our "sun"
     vec3 lightColor = vec3(.992, .984, .827);
-    vec3 lightWorldPos = vec3(1.5, 4.0, 3.0);
+    vec3 lightWorldPos = vec3(0.0, 2.0, 0.0);
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
 
     // ambient color (low light from scattered sunlight)
@@ -44,7 +45,8 @@ void main() {
     vec3 specularColor = lightColor * specularStrength * material.specular;
 
     // final color
-    vec3 color = texture(textureSampler, uvCoord).rgb; // sample texture
+    // vec3 color = texture(diffuseTexture, uvCoord).rgb; // sample texture
+    vec3 color = vec3(1.0f, 1.0f, 1.0f); // sample texture
     color = color * (ambientColor + diffuseColor + specularColor); // combine light colors
 
     // write to screen

@@ -14,67 +14,49 @@ struct Mesh {
         glCreateBuffers(1, &vbo); // vertex buffer object
         glCreateBuffers(1, &ebo); // element buffer object (or: index buffer object)
     }
-    ~Mesh() {
-        std::vector<GLuint> buffers = { vao, vbo, ebo };
-        glDeleteBuffers(buffers.size(), buffers.data());
-    }
+    Mesh(aiMesh* pMesh) : Mesh() {
 
-    void generate_cube() {
-        // cube
-        float n = -0.5f; // for readability
-        float p = 0.5f; // for readability
-        vertices = {
-            n, n, p, .5f, .0f, .0f, 1.0/3.0, 0.00f, 0.0f, 0.0f, 1.0f, // front
-            p, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f, 0.0f, 0.0f, 1.0f,
-            n, p, p, .0f, .0f, .5f, 1.0/3.0, 0.25f, 0.0f, 0.0f, 1.0f,
-            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, 0.0f, 0.0f, 1.0f,
+        // handle all vertices for this mesh
+        vertices.reserve(pMesh->mNumVertices);
+        for (int i = 0; i < pMesh->mNumVertices; i++) {
+            Vertex vertex;
 
-            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, 0.0f, 0.0f, -1.0f, // back
-            p, n, n, .0f, .5f, .0f, 2.0/3.0, 0.00f, 0.0f, 0.0f, -1.0f,
-            n, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, 0.0f, 0.0f, -1.0f,
-            p, p, n, .5f, .5f, .0f, 2.0/3.0, 0.25f, 0.0f, 0.0f, -1.0f,
+            // extract positions from mVertices
+            vertex.pos.x = pMesh->mVertices[i].x;
+            vertex.pos.y = pMesh->mVertices[i].y;
+            vertex.pos.z = pMesh->mVertices[i].z;
+            // extract normals from mNormals
+            vertex.norm.x = pMesh->mNormals[i].x;
+            vertex.norm.y = pMesh->mNormals[i].y;
+            vertex.norm.z = pMesh->mNormals[i].z;
+            // extract uv coords from 
+            vertex.uv.x = pMesh->mTextureCoords[0][i].x;
+            vertex.uv.y = pMesh->mTextureCoords[0][i].y;
 
-            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, -1.0f, 0.0f, 0.0f, // left
-            n, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f, -1.0f, 0.0f, 0.0f,
-            n, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, -1.0f, 0.0f, 0.0f,
-            n, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, -1.0f, 0.0f, 0.0f,
+            vertices.push_back(vertex);
+        }
 
-            p, n, n, .5f, .0f, .0f, 1.0/3.0, 0.00f, 1.0f, 0.0f, 0.0f, // right
-            p, n, p, .0f, .5f, .0f, 2.0/3.0, 0.00f, 1.0f, 0.0f, 0.0f,
-            p, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, 1.0f, 0.0f, 0.0f,
-            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, 1.0f, 0.0f, 0.0f,
+        // handle all indices, each face is 3 indices
+        indices.reserve(pMesh->mNumFaces * 3);
+        for (int i = 0; i < pMesh->mNumFaces; i++) {
+            aiFace face = pMesh->mFaces[i];
+            for (int j = 0; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
+            }
+        }
 
-            n, p, n, .5f, .0f, .0f, 1.0/3.0, 0.50f, 0.0f, 1.0f, 0.0f, // top
-            n, p, p, .0f, .5f, .0f, 2.0/3.0, 0.50f, 0.0f, 1.0f, 0.0f,
-            p, p, n, .0f, .0f, .5f, 1.0/3.0, 0.25f, 0.0f, 1.0f, 0.0f,
-            p, p, p, .5f, .5f, .0f, 2.0/3.0, 0.25f, 0.0f, 1.0f, 0.0f,
+        // simply assigned the material index for later
+        materialIndex = pMesh->mMaterialIndex;
 
-            n, n, n, .5f, .0f, .0f, 1.0/3.0, 0.75f, 0.0f, -1.0f, 0.0f, // bottom
-            n, n, p, .0f, .5f, .0f, 2.0/3.0, 0.75f, 0.0f, -1.0f, 0.0f,
-            p, n, n, .0f, .0f, .5f, 1.0/3.0, 1.00f, 0.0f, -1.0f, 0.0f,
-            p, n, p, .5f, .5f, .0f, 2.0/3.0, 1.00f, 0.0f, -1.0f, 0.0f,
-        };
-        indices = {
-            0, 1, 3, 3, 2, 0, // front
-            5, 4, 7, 7, 4, 6, // back
-            8, 9, 11, 11, 10, 8, // left
-            13, 12, 15, 15, 12, 14, // right
-            16, 17, 19, 19, 18, 16, // top
-            23, 21, 20, 23, 20, 22, // bottom
-        };
-
-        // OpenGL buffers will be our handle for GPU memory
-        // we cannot interact with it directly like with cpu/system memory
-        GLsizeiptr nBytes = vertices.size() * sizeof(GLfloat);
+        // describe vertex buffer
+        GLsizeiptr nBytes = vertices.size() * sizeof(Vertex);
         glNamedBufferStorage(vbo, nBytes, vertices.data(), 0);
-
+        // describe index buffer
         nBytes = indices.size() * sizeof(GLuint);
         glNamedBufferStorage(ebo, nBytes, indices.data(), 0);
 
-        // we need to tell OpenGL how to interpret vertex data
-        // this info is stored inside the vao
-        // specify buffers
-        glVertexArrayVertexBuffer(vao, 0, vbo, 0, 8 * sizeof(GLfloat));
+        // describe buffer contents
+        glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex));
         glVertexArrayElementBuffer(vao, ebo);
         // specify vertex format
         GLuint binding = 0;
@@ -84,13 +66,21 @@ struct Mesh {
         glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
         i = 1; // normal
-        glVertexArrayAttribFormat(vao, i, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat));
+        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat));
         glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
         i = 2; // uv coordinate
-        glVertexArrayAttribFormat(vao, i, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat));
+        glVertexArrayAttribFormat(vao, i, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat));
         glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
+    }
+    ~Mesh() {
+        std::vector<GLuint> buffers = { vao, vbo, ebo };
+        glDeleteBuffers(buffers.size(), buffers.data());
+    }
+
+
+    void generate_cube() {
 
         // load image
         int width, height, nChannels; // output for stbi_load_from_memory
@@ -114,10 +104,13 @@ struct Mesh {
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
     }
 
+public:
+    unsigned int materialIndex;
+
 private:
     GLuint vao; // vertex array object
     GLuint vbo; // vertex buffer object
     GLuint ebo; // element buffer object
-    std::vector<GLfloat> vertices;
+    std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 };

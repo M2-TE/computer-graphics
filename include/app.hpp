@@ -62,7 +62,7 @@ private:
         if (input.get_key_pressed(SDL_KeyCode::SDLK_ESCAPE)) SDL_SetRelativeMouseMode(!SDL_GetRelativeMouseMode());
 
         // camera movement
-        float movementSpeed = timer.get_delta() * 1.5f;
+        float movementSpeed = timer.get_delta() * 1000.5f;
         if (input.get_key_down(SDL_KeyCode::SDLK_s)) camera.translate(0.0f, 0.0f, movementSpeed);
         if (input.get_key_down(SDL_KeyCode::SDLK_w)) camera.translate(0.0f, 0.0f, -movementSpeed);
         if (input.get_key_down(SDL_KeyCode::SDLK_e)) camera.translate(0.0f, movementSpeed, 0.0f);
@@ -80,8 +80,8 @@ private:
     Input input;
     Timer timer;
     Window window = Window(1280, 720);
-    Camera camera = Camera(70, window.width, window.height, 0.1f, 10.0f);
+    Camera camera = Camera(70, window.width, window.height, 0.1f, 10000.0f);
     Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
-    Model model = Model("models/dino.fbx");
+    Model model = Model("models/sponza/sponza.obj");
     bool bRunning = true;
 };
