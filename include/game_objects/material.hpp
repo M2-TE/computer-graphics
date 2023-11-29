@@ -9,7 +9,14 @@ struct Material {
         glUniform1f(20, shininess);
 
         // binding texture seperately for now
-        // glBindTextureUnit(0, diffuseTexture);
+        if (diffuseTexture > 0) {
+            glBindTextureUnit(0, diffuseTexture);
+        }
+        else {
+            // unbinds texture instead of binding new one
+            // this seems to not work on some machines, gotta figure out why
+            glBindTextureUnit(0, 0);
+        }
     }
 
     glm::vec3 ambient = glm::vec3(0.1f); // first slot
