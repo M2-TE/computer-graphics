@@ -3,7 +3,6 @@
 #include <assimp/IOSystem.hpp>
 #include <cmrc/cmrc.hpp>
 #include <cstring>
-CMRC_DECLARE(models);
 
 // https://assimp.sourceforge.net/lib_html/class_assimp_1_1_i_o_stream.html
 class CMRC_IOStream : public Assimp::IOStream {

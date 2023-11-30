@@ -36,7 +36,6 @@ struct Model {
         // load model
         const aiScene* pScene = importer.ReadFile(path, flags);
         if (pScene == nullptr) std::cerr << importer.GetErrorString() << '\n';
-        if (pScene->mRootNode == nullptr  || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) std::cerr<<"err"<<std::endl;
 
         // prepare for data storage
         meshes.reserve(pScene->mNumMeshes);
@@ -60,16 +59,17 @@ struct Model {
                 // build path to texture resource
                 aiString aiTexPath;
                 pMaterial->Get(AI_MATKEY_TEXTURE_DIFFUSE(0), aiTexPath);
-                std::string texPath("../models/sponza/");
+                std::string texPath("models/sponza/");
                 texPath.append(aiTexPath.C_Str());
 
                 // create texture
                 GLuint texture;
                 glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 
-                // load texture from disk using stbi
+                // load texture from memory using stbi
+                auto rawTex = load_model(texPath);
                 int width, height, nChannels;
-                stbi_uc* pImage = stbi_load(texPath.c_str(), &width, &height, &nChannels, 4);
+                stbi_uc* pImage = stbi_load_from_memory(rawTex.first, rawTex.second, &width, &height, &nChannels, 4);
                 if (pImage == nullptr) std::cerr << "failed to load model texture" << std::endl;
                 glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
                 glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
