@@ -67,7 +67,7 @@ struct Model {
                 glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 
                 // load texture from memory using stbi
-                auto rawTex = load_model(texPath);
+                auto rawTex = load_model_resource(texPath);
                 int width, height, nChannels;
                 stbi_uc* pImage = stbi_load_from_memory(rawTex.first, rawTex.second, &width, &height, &nChannels, 4);
                 if (pImage == nullptr) std::cerr << "failed to load model texture" << std::endl;

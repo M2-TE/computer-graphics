@@ -30,7 +30,7 @@ static inline std::pair<const unsigned char*, std::size_t> load_image(const std:
 }
 
 CMRC_DECLARE(models);
-static inline std::pair<const unsigned char*, std::size_t> load_model(const std::string& path) {
+static inline std::pair<const unsigned char*, std::size_t> load_model_resource(const std::string& path) {
     auto fs = cmrc::models::get_filesystem();
     if (fs.exists(path)) {
         auto file = fs.open(path);
