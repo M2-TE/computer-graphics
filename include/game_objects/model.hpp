@@ -8,6 +8,7 @@
 #include "utils.hpp"
 #include "mesh.hpp"
 #include "material.hpp"
+#include "cmrc_io.hpp"
 
 // sample models:
 // https://github.com/assimp/assimp-mdb
@@ -26,23 +27,23 @@ struct Model {
         // flags |= aiProcess_SplitLargeMeshes; // split into multiple meshes if model is too large
         // flags |= aiProcess_OptimizeMeshes; // merge multiple meshes into a single one
 
-        /// version A: loading model from memory
-        /// only really feasible if model format is one single file (gltf, fbx, etc.)
-        // std::size_t extOffset = path.find_last_of("."); // we often have to explicitly tell it the file extensions
-        // std::string extension = path.substr(extOffset);
-        // auto modelData = load_model(path); // retrieve model from memory
-        // const aiScene* pScene = importer.ReadFileFromMemory(modelData.first, modelData.second, flags, extension.c_str());
-        /// version B: loading model from disk
-        /// this needs to be used for formats like .obj that are not just one file
-        const aiScene* pScene = importer.ReadFile("../models/sponza/sponza.obj", flags);
-        if (pScene == nullptr) std::cout << importer.GetErrorString() << '\n';
-        
+        // loading model from memory:
+        // normally only feasible if model format is one single file (gltf, fbx, etc.)
+        // we need to implement a custom virtual IO system for assimp
+        // in order to load fragmented model formats (like .obj)
+        importer.SetIOHandler(new CMRC_IOSystem());
+
+        // load model
+        const aiScene* pScene = importer.ReadFile(path, flags);
+        if (pScene == nullptr) std::cerr << importer.GetErrorString() << '\n';
+        if (pScene->mRootNode == nullptr  || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) std::cerr<<"err"<<std::endl;
+
         // prepare for data storage
         meshes.reserve(pScene->mNumMeshes);
         materials.resize(pScene->mNumMaterials);
 
-        std::cout << meshes.capacity() << std::endl;
-        std::cout << materials.size() << std::endl;
+        std::cout << meshes.capacity() << " meshes\n";
+        std::cout << materials.size() << " materials\n";
 
         // create meshes
         for (int i = 0; i < pScene->mNumMeshes; i++) {

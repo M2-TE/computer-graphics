@@ -57,8 +57,8 @@ file(GLOB_RECURSE image-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_D
 cmrc_add_resources(images "${image-files}")
 # embed models into library "models"
 cmrc_add_resource_library(models)
-# file(GLOB_RECURSE model-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "models/*")
-# cmrc_add_resources(models "${model-files}")
+file(GLOB_RECURSE model-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "models/*")
+cmrc_add_resources(models "${model-files}")
 
 # create executable target
 add_executable(${PROJECT_NAME})
