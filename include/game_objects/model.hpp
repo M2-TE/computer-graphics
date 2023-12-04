@@ -37,6 +37,11 @@ struct Model {
         const aiScene* pScene = importer.ReadFile(path, flags);
         if (pScene == nullptr) std::cerr << importer.GetErrorString() << '\n';
 
+        // save path to model for later
+        size_t sepIndex = path.find_last_of('/');
+        std::string modelRoot = path.substr(0, sepIndex + 1);
+        std::cout << modelRoot << std::endl;
+
         // prepare for data storage
         meshes.reserve(pScene->mNumMeshes);
         materials.resize(pScene->mNumMaterials);
@@ -55,11 +60,14 @@ struct Model {
         for (int i = 0; i < pScene->mNumMaterials; i++) {
             aiMaterial* pMaterial = pScene->mMaterials[i];
 
+            // TODO
+            // pScene->GetEmbeddedTexture();
+
             if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE)) {
                 // build path to texture resource
                 aiString aiTexPath;
                 pMaterial->Get(AI_MATKEY_TEXTURE_DIFFUSE(0), aiTexPath);
-                std::string texPath("models/sponza/");
+                std::string texPath(modelRoot);
                 texPath.append(aiTexPath.C_Str());
 
                 // create texture
@@ -85,7 +93,8 @@ struct Model {
 
         transform.bind();
         for (int i = 0; i < meshes.size(); i++) {
-            materials[meshes[i].materialIndex].bind();
+            Material& material = materials[meshes[i].materialIndex];
+            material.bind();
             meshes[i].draw();
         }
     }

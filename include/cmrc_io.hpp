@@ -59,7 +59,6 @@ private:
 // https://assimp.sourceforge.net/lib_html/class_assimp_1_1_i_o_system.html
 class CMRC_IOSystem : public Assimp::IOSystem {
 public:
-    // TODO: try removing IOSystem ctor
     CMRC_IOSystem() : fs(cmrc::models::get_filesystem()) {}
     ~CMRC_IOSystem() = default;
 

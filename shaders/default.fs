@@ -25,7 +25,7 @@ void main() {
 
     // create our "sun"
     vec3 lightColor = vec3(.992, .984, .827);
-    vec3 lightWorldPos = vec3(0.0, 4.0, 0.0);
+    vec3 lightWorldPos = vec3(0.0, 100.0, 0.0);
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
 
     // ambient color (low light from scattered sunlight)
