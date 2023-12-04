@@ -15,6 +15,7 @@ struct Material {
     vec3 diffuse; // second slot
     vec3 specular; // third slot
     float shininess; // fourth slot
+    float shininessStrength; // fifth slot
 };
 
 // Material needs 4 slots, similar to a matrix
@@ -25,7 +26,7 @@ void main() {
 
     // create our "sun"
     vec3 lightColor = vec3(.992, .984, .827);
-    vec3 lightWorldPos = vec3(0.0, 100.0, 0.0);
+    vec3 lightWorldPos = vec3(0.0, 300.0, 0.0);
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
 
     // ambient color (low light from scattered sunlight)
@@ -40,7 +41,7 @@ void main() {
     // specular color
     vec3 cameraDir = normalize(cameraWorldPos - worldPos); // unit vector from camera to fragment
     vec3 reflectDir = reflect(-lightDir, normal);
-    float specularStrength = 0.5; // specular modifier
+    float specularStrength = material.shininessStrength; // specular modifier
     specularStrength *= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
     vec3 specularColor = lightColor * specularStrength * material.specular;
 

@@ -40,7 +40,6 @@ struct Model {
         // save path to model for later
         size_t sepIndex = path.find_last_of('/');
         std::string modelRoot = path.substr(0, sepIndex + 1);
-        std::cout << modelRoot << std::endl;
 
         // prepare for data storage
         meshes.reserve(pScene->mNumMeshes);
@@ -59,9 +58,27 @@ struct Model {
         // https://assimp.sourceforge.net/lib_html/materials.html
         for (int i = 0; i < pScene->mNumMaterials; i++) {
             aiMaterial* pMaterial = pScene->mMaterials[i];
+            Material& material = materials[i];
+            aiColor3D color;
 
-            // TODO
-            // pScene->GetEmbeddedTexture();
+            // Ambient Color
+            pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
+            material.ambient.r = color.r;
+            material.ambient.g = color.g;
+            material.ambient.b = color.b;
+            // Diffuse Color
+            pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+            material.diffuse.r = color.r;
+            material.diffuse.g = color.g;
+            material.diffuse.b = color.b;
+            // Specular Color
+            pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
+            material.specular.r = color.r;
+            material.specular.g = color.g;
+            material.specular.b = color.b;
+            // Shininess and its strength
+            pMaterial->Get(AI_MATKEY_SHININESS, material.shininess);
+            pMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, material.shininessStrength);
 
             if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE)) {
                 // build path to texture resource
@@ -84,7 +101,7 @@ struct Model {
                 stbi_image_free(pImage);
 
                 // store texture into material
-                materials[i].diffuseTexture = texture;
+                material.diffuseTexture = texture;
             }
         }
     }
