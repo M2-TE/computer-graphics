@@ -14,6 +14,7 @@
 #include "input.hpp"
 #include "timer.hpp"
 #include "game_objects/model.hpp"
+#include "game_objects/light.hpp"
 #include "game_objects/camera.hpp"
 
 struct App {
@@ -40,8 +41,10 @@ struct App {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             pipeline.bind();
             camera.bind();
+            light.bind();
             
             // now draw all the models
+            light.draw();
             model.draw();
             // ...
             // ...
@@ -83,5 +86,6 @@ private:
     Camera camera = Camera(70, window.width, window.height, 0.1f, 10000.0f);
     Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Model model = Model("models/sponza/sponza.obj");
+    Light light = Light(0.0f, 300.0f, 0.0f);
     bool bRunning = true;
 };

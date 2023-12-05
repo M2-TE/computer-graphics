@@ -5,9 +5,12 @@ layout (location = 0) in vec3 worldPos;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 uvCoord;
 // output
-out vec4 pixelColor;
+layout (location = 0) out vec4 pixelColor;
 
 layout (location = 16) uniform vec3 cameraWorldPos;
+layout (location = 17) uniform vec3 lightWorldPos;
+layout (location = 18) uniform vec3 lightColor;
+layout (location = 19) uniform uint isGlowing;
 
 // define custom struct
 struct Material {
@@ -18,15 +21,13 @@ struct Material {
     float shininessStrength; // fifth slot
 };
 
-// Material needs 4 slots, similar to a matrix
-layout (location = 17) uniform Material material;
-uniform sampler2D diffuseTexture;
+// Material needs multiple slots
+layout (location = 20) uniform Material material;
+layout (binding = 0) uniform sampler2D diffuseTexture;
 
 void main() {
 
     // create our "sun"
-    vec3 lightColor = vec3(.992, .984, .827);
-    vec3 lightWorldPos = vec3(0.0, 300.0, 0.0);
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
 
     // ambient color (low light from scattered sunlight)
@@ -36,6 +37,7 @@ void main() {
     // light color
     float diffuseStrength = dot(normal, lightDir); // calc intensity of light
     diffuseStrength = max(diffuseStrength, 0.0); // filter out negative intensity
+    if (isGlowing > 0) diffuseStrength = 1.0f;
     vec3 diffuseColor = lightColor * diffuseStrength * material.diffuse;
 
     // specular color

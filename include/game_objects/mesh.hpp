@@ -15,7 +15,6 @@ struct Mesh {
         glCreateBuffers(1, &ebo); // element buffer object (or: index buffer object)
     }
     Mesh(aiMesh* pMesh) : Mesh() {
-
         // handle all vertices for this mesh
         vertices.reserve(pMesh->mNumVertices);
         for (int i = 0; i < pMesh->mNumVertices; i++) {
@@ -79,9 +78,10 @@ struct Mesh {
         glDeleteBuffers(buffers.size(), buffers.data());
     }
 
-
+    void generate_sphere() {
+        // TODO
+    }
     void generate_cube() {
-
         // load image
         int width, height, nChannels; // output for stbi_load_from_memory
         auto rawImage = load_image("images/grass.png");

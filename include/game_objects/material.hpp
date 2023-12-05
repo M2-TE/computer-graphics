@@ -3,12 +3,14 @@
 struct Material {
     void bind() {
         // bind each component to its location
-        glUniform3f(17, ambient.r, ambient.g, ambient.b);
-        glUniform3f(18, diffuse.r, diffuse.g, diffuse.b);
-        glUniform3f(19, specular.r, specular.g, specular.b);
-        glUniform1f(20, shininess);
-        glUniform1f(21, shininessStrength);
+        GLuint startLocation = 20;
+        glUniform3f(startLocation++, ambient.r, ambient.g, ambient.b);
+        glUniform3f(startLocation++, diffuse.r, diffuse.g, diffuse.b);
+        glUniform3f(startLocation++, specular.r, specular.g, specular.b);
+        glUniform1f(startLocation++, shininess);
+        glUniform1f(startLocation, shininessStrength);
 
+        // the binding index is set in shader by: layout (binding = x)
         glBindTextureUnit(0, diffuseTexture);
     }
 
@@ -20,6 +22,6 @@ struct Material {
     
     // there can be multiple ambient/diffuse/specular textures at once
     // and they are combined with a blend factor
-    // we ignore that for now
+    // we ignore that for now and use one single texture
     GLuint diffuseTexture;
 };

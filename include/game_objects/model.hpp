@@ -22,13 +22,12 @@ struct Model {
         unsigned int flags = 0; // https://assimp.sourceforge.net/lib_html/postprocess_8h.html
         flags |= aiProcess_Triangulate; // triangulate all faces if not already triangulated
         flags |= aiProcess_GenNormals; // generate normals if they dont exist
-        flags |= aiProcess_GenUVCoords; // generate uv coords if they dont exist
         flags |= aiProcess_FlipUVs; // OpenGL prefers flipped y axis
         // flags |= aiProcess_SplitLargeMeshes; // split into multiple meshes if model is too large
         // flags |= aiProcess_OptimizeMeshes; // merge multiple meshes into a single one
 
         // loading model from memory:
-        // normally only feasible if model format is one single file (gltf, fbx, etc.)
+        // normally only feasible if model format is one single file (glb, fbx, etc.)
         // we need to implement a custom virtual IO system for assimp
         // in order to load fragmented model formats (like .obj)
         importer.SetIOHandler(new CMRC_IOSystem());
@@ -36,22 +35,50 @@ struct Model {
         // load model
         const aiScene* pScene = importer.ReadFile(path, flags);
         if (pScene == nullptr) std::cerr << importer.GetErrorString() << '\n';
+        else std::cout << "Loaded model: " << path << std::endl;
 
-        // save path to model for later
+        // we need to figure out the path the root of a model for formats such as .obj
         size_t sepIndex = path.find_last_of('/');
-        std::string modelRoot = path.substr(0, sepIndex + 1);
+        modelRoot = path.substr(0, sepIndex + 1);
+
+
+        // TESTING
+        // path = std::string("../").append(path);
+        // importer.SetIOHandler(nullptr);
+        // const aiScene* pScene2 = importer.ReadFile(path, flags);
+        // if (pScene2 == nullptr) std::cerr << importer.GetErrorString() << '\n';
+        // else std::cout << "Loaded model: " << path << std::endl;
+        // std::cout 
+        //     << "Meshes: " << pScene2->mNumMeshes << '\n'
+        //     << "Materials " << pScene2->mNumMaterials << '\n'
+        //     << "Textures: " << pScene2->mNumTextures << '\n';
 
         // prepare for data storage
         meshes.reserve(pScene->mNumMeshes);
+        textures.reserve(pScene->mNumTextures);
         materials.resize(pScene->mNumMaterials);
 
-        std::cout << meshes.capacity() << " meshes\n";
-        std::cout << materials.size() << " materials\n";
+        std::cout 
+            << "Meshes: " << pScene->mNumMeshes << '\n'
+            << "Materials " << pScene->mNumMaterials << '\n'
+            << "Textures: " << pScene->mNumTextures << '\n';
 
         // create meshes
         for (int i = 0; i < pScene->mNumMeshes; i++) {
             aiMesh* pMesh = pScene->mMeshes[i];
             meshes.emplace_back(pMesh);
+        }
+
+        // create textures (if embedded into model, such as .fbx)
+        for (int i = 0; i < pScene->mNumTextures; i++) {
+            aiTexture* pTexture = pScene->mTextures[i];
+            GLuint texture;
+            
+            // check if embedded texture is compressed
+            if (pTexture->mHeight == 0) {
+                texture = load_texture(pTexture);
+            }
+            else std::cerr << "uncompressed embedded images not handled yet\n";
         }
 
         // create materials
@@ -80,34 +107,15 @@ struct Model {
             pMaterial->Get(AI_MATKEY_SHININESS, material.shininess);
             pMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, material.shininessStrength);
 
+            // load diffuse texture
             if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE)) {
-                // build path to texture resource
-                aiString aiTexPath;
-                pMaterial->Get(AI_MATKEY_TEXTURE_DIFFUSE(0), aiTexPath);
-                std::string texPath(modelRoot);
-                texPath.append(aiTexPath.C_Str());
-
-                // create texture
-                GLuint texture;
-                glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-
-                // load texture from memory using stbi
-                auto rawTex = load_model_resource(texPath);
-                int width, height, nChannels;
-                stbi_uc* pImage = stbi_load_from_memory(rawTex.first, rawTex.second, &width, &height, &nChannels, 4);
-                if (pImage == nullptr) std::cerr << "failed to load model texture" << std::endl;
-                glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
-                glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
-                stbi_image_free(pImage);
-
-                // store texture into material
-                material.diffuseTexture = texture;
+                material.diffuseTexture = get_texture(pMaterial, aiTextureType_DIFFUSE);
             }
         }
+
     }
 
     void draw() {
-
         transform.bind();
         for (int i = 0; i < meshes.size(); i++) {
             Material& material = materials[meshes[i].materialIndex];
@@ -116,8 +124,59 @@ struct Model {
         }
     }
 
+private:
+    GLuint get_texture(aiMaterial* pMaterial, aiTextureType texType) {
+        // build path to texture resource
+        aiString aiTexPath;
+        pMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), aiTexPath);
+
+        // check if we previously loaded this texture
+        auto textureMapIter = textures.find(aiTexPath.C_Str());
+        if (textureMapIter != textures.end()) return textureMapIter->second;
+
+        // load texture from memory using stbi
+        std::string texPath(modelRoot);
+        texPath.append(aiTexPath.C_Str());
+        auto rawTex = load_model_resource(texPath);
+        int width, height, nChannels;
+        stbi_uc* pImage = stbi_load_from_memory(rawTex.first, rawTex.second, &width, &height, &nChannels, 4);
+        if (pImage == nullptr) std::cerr << "failed to load model texture" << std::endl;
+
+        // create texture
+        GLuint texture;
+        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+        glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
+        glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
+        stbi_image_free(pImage);
+
+        // add texture to our lookup map
+        textures[aiTexPath.C_Str()] = texture;
+        return texture;
+    }
+    GLuint load_texture(aiTexture* pTexture) {
+        // uncompress using stbi
+        int width, height, nChannels;
+        const stbi_uc* pCompressedTexture = reinterpret_cast<stbi_uc*>(pTexture->pcData); // cast to a type that stbi understands
+        stbi_uc* pImage = stbi_load_from_memory(pCompressedTexture, pTexture->mWidth, &width, &height, &nChannels, 4);
+        if (pImage == nullptr) std::cerr << "failed to load embedded model texture" << std::endl;
+
+        // create texture
+        GLuint texture;
+        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+        glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
+        glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
+        stbi_image_free(pImage);
+
+        // add texture to our lookup map
+        textures[pTexture->mFilename.C_Str()] = texture;
+
+        return texture;
+    }
 
     std::vector<Mesh> meshes;
     std::vector<Material> materials;
+    std::unordered_map<std::string, GLuint> textures;
+    std::string modelRoot;
+public:
     Transform transform;
 };

@@ -11,10 +11,20 @@ public:
         return file.size();
     }
     size_t Read(void* pBuffer, size_t size, size_t count) override final {
-        size_t bytesLeft = std::max<size_t>(file.cend() - current, 0);
-        size_t eligibleBytes = std::min<size_t>(count, bytesLeft);
+
+        size_t bytes = size * count; // total requested bytes
+        size_t maxBytesLeft = std::max<size_t>(file.cend() - current, 0);
+        size_t eligibleBytes = std::min<size_t>(bytes, maxBytesLeft);
+        size_t nCounts = eligibleBytes / size; // calc number of valid objects
+        if (nCounts == 0 || count == 0) return 0;
+
+        // final number of bytes read = valid objects * their size
+        eligibleBytes = nCounts * size;
         std::memcpy(pBuffer, current, eligibleBytes);
-        return eligibleBytes;
+        current += eligibleBytes;
+
+        // return number of objects that were read
+        return nCounts;
     }
     aiReturn Seek(size_t offset, aiOrigin origin) override final {
         switch(origin) {

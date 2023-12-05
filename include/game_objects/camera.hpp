@@ -31,6 +31,6 @@ struct Camera {
     }
 
     glm::mat4x4 projectionMatrix;
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, 5.0f);
+    glm::vec3 position = glm::vec3(0.0f, 100.0f, 5.0f);
     glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f); // euler rotation
 };
