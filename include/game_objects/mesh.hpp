@@ -33,10 +33,8 @@ struct Mesh {
         float sectorStep = 2.0f * pi / static_cast<float>(nSectors);
         float stackStep = pi / static_cast<float>(nStacks);
 
-        // preallocate some space for vertices and indices
+        // preallocate some space for vertices
         vertices.reserve((nSectors + 1) * (nStacks + 1));
-        // indices.reserve(vertices.capacity() / 4 * 6 * 3);
-        std::cout << indices.capacity() << std::endl;
 
         // create vertices
         for (int i = 0; i <= nStacks; i++) {
@@ -86,8 +84,6 @@ struct Mesh {
                 }
             }
         }
-
-        std::cout << indices.size() << std::endl;
 
         describe_layout();
     }
