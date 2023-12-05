@@ -15,7 +15,8 @@
 // model used here:
 // https://github.com/jimmiebergmann/Sponza
 struct Model {
-    Model(std::string path) {
+    Model(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale, std::string path)
+    : transform(pos, rot, scale) {
         Assimp::Importer importer;
 
         // flags that allow some automatic post processing of model
@@ -23,16 +24,9 @@ struct Model {
         flags |= aiProcess_Triangulate; // triangulate all faces if not already triangulated
         flags |= aiProcess_GenNormals; // generate normals if they dont exist
         flags |= aiProcess_FlipUVs; // OpenGL prefers flipped y axis
-        // flags |= aiProcess_SplitLargeMeshes; // split into multiple meshes if model is too large
-        // flags |= aiProcess_OptimizeMeshes; // merge multiple meshes into a single one
-
-        // loading model from memory:
-        // normally only feasible if model format is one single file (glb, fbx, etc.)
-        // we need to implement a custom virtual IO system for assimp
-        // in order to load fragmented model formats (like .obj)
-        importer.SetIOHandler(new CMRC_IOSystem());
-
+        
         // load model
+        importer.SetIOHandler(new CMRC_IOSystem()); // custom virtual IO system
         const aiScene* pScene = importer.ReadFile(path, flags);
         if (pScene == nullptr) std::cerr << importer.GetErrorString() << '\n';
         else std::cout << "Loaded model: " << path << std::endl;
@@ -58,7 +52,7 @@ struct Model {
         textures.reserve(pScene->mNumTextures);
         materials.resize(pScene->mNumMaterials);
 
-        std::cout 
+        std::cout
             << "Meshes: " << pScene->mNumMeshes << '\n'
             << "Materials " << pScene->mNumMaterials << '\n'
             << "Textures: " << pScene->mNumTextures << '\n';

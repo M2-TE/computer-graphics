@@ -5,6 +5,7 @@
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 norm;
+    // glm::vec3 
     glm::vec2 uv;
 };
 
@@ -15,6 +16,25 @@ struct Mesh {
         glCreateBuffers(1, &ebo); // element buffer object (or: index buffer object)
     }
     Mesh(aiMesh* pMesh) : Mesh() {
+        load_mesh(pMesh);
+    }
+    ~Mesh() {
+        std::vector<GLuint> buffers = { vao, vbo, ebo };
+        glDeleteBuffers(buffers.size(), buffers.data());
+    }
+
+    void generate_sphere() {
+        // TODO
+    }
+    void generate_cube() {
+        vertices = {
+
+        };
+        indices = {
+
+        };
+    }
+    void load_mesh(aiMesh* pMesh) {
         // handle all vertices for this mesh
         vertices.reserve(pMesh->mNumVertices);
         for (int i = 0; i < pMesh->mNumVertices; i++) {
@@ -73,32 +93,7 @@ struct Mesh {
         glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
     }
-    ~Mesh() {
-        std::vector<GLuint> buffers = { vao, vbo, ebo };
-        glDeleteBuffers(buffers.size(), buffers.data());
-    }
 
-    void generate_sphere() {
-        // TODO
-    }
-    void generate_cube() {
-        // load image
-        int width, height, nChannels; // output for stbi_load_from_memory
-        auto rawImage = load_image("images/grass.png");
-        stbi_uc* pImage = stbi_load_from_memory(rawImage.first, rawImage.second, &width, &height, &nChannels, 3); // explicitly ask for 3 channels
-        // create texture to store image in (texture is gpu buffer)
-        GLuint texture;
-        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-        glTextureStorage2D(texture, 1, GL_RGB8, width, height);
-        glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pImage);
-        stbi_image_free(pImage);
-        // sampler parameters
-        glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT); // s is the u coordinate (width)
-        glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT); // t is the v coordinate (height)
-        glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // interpolation mode when scaling image down
-        glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // interpolation mode when scaling image up
-    }
-    
     void draw() {
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);

@@ -65,7 +65,8 @@ private:
         if (input.get_key_pressed(SDL_KeyCode::SDLK_ESCAPE)) SDL_SetRelativeMouseMode(!SDL_GetRelativeMouseMode());
 
         // camera movement
-        float movementSpeed = timer.get_delta() * 1000.5f;
+        float movementSpeed = timer.get_delta() * 2.0f;
+        if (input.get_key_down(SDL_KeyCode::SDLK_LSHIFT)) movementSpeed *= 3.0f; // sprint button
         if (input.get_key_down(SDL_KeyCode::SDLK_s)) camera.translate(0.0f, 0.0f, movementSpeed);
         if (input.get_key_down(SDL_KeyCode::SDLK_w)) camera.translate(0.0f, 0.0f, -movementSpeed);
         if (input.get_key_down(SDL_KeyCode::SDLK_e)) camera.translate(0.0f, movementSpeed, 0.0f);
@@ -83,9 +84,9 @@ private:
     Input input;
     Timer timer;
     Window window = Window(1280, 720);
-    Camera camera = Camera(70, window.width, window.height, 0.1f, 10000.0f);
     Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
-    Model model = Model("models/sponza/sponza.obj");
-    Light light = Light(0.0f, 300.0f, 0.0f);
+    Camera camera = Camera({0, 1, 1}, {0, 0, 0}, window.width, window.height);
+    Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");
+    Light light = Light({0, 1, 0}, {0, 0, 0}, {1, 1, 1});
     bool bRunning = true;
 };

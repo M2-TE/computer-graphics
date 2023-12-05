@@ -8,7 +8,7 @@ struct Material {
         glUniform3f(startLocation++, diffuse.r, diffuse.g, diffuse.b);
         glUniform3f(startLocation++, specular.r, specular.g, specular.b);
         glUniform1f(startLocation++, shininess);
-        glUniform1f(startLocation, shininessStrength);
+        glUniform1f(startLocation++, shininessStrength);
 
         // the binding index is set in shader by: layout (binding = x)
         glBindTextureUnit(0, diffuseTexture);

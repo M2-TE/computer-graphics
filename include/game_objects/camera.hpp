@@ -5,9 +5,13 @@
 #include <glm/gtc/type_ptr.hpp> // allows use of glm::value_ptr to get raw pointer to data
 
 struct Camera {
-    Camera(float fov, float width, float height, float near, float far) {
-        projectionMatrix = glm::perspectiveFov(fov, width, height, near, far);
-        // projectionMatrix = glm::perspective(fov, width / height, 0.1f, 10.0f);
+    Camera(glm::vec3 position, glm::vec3 rotation, float width, float height)
+    : position(position), rotation(rotation) {
+        build_projection(width, height);
+    }
+    
+    void build_projection(float width, float height) {
+        projectionMatrix = glm::perspectiveFov(fov, width, height, nearPlane, farPlane);
     }
 
     // translate relative to camera direction
@@ -33,4 +37,7 @@ struct Camera {
     glm::mat4x4 projectionMatrix;
     glm::vec3 position = glm::vec3(0.0f, 100.0f, 5.0f);
     glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f); // euler rotation
+    float nearPlane = 0.1f;
+    float farPlane = 100.0f;
+    float fov = 70;
 };

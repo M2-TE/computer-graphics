@@ -10,7 +10,6 @@ layout (location = 0) out vec4 pixelColor;
 layout (location = 16) uniform vec3 cameraWorldPos;
 layout (location = 17) uniform vec3 lightWorldPos;
 layout (location = 18) uniform vec3 lightColor;
-layout (location = 19) uniform uint isGlowing;
 
 // define custom struct
 struct Material {
@@ -37,7 +36,6 @@ void main() {
     // light color
     float diffuseStrength = dot(normal, lightDir); // calc intensity of light
     diffuseStrength = max(diffuseStrength, 0.0); // filter out negative intensity
-    if (isGlowing > 0) diffuseStrength = 1.0f;
     vec3 diffuseColor = lightColor * diffuseStrength * material.diffuse;
 
     // specular color
