@@ -4,7 +4,8 @@
 struct Light {
     Light(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) 
     : transform(pos, rot, scale) {
-        mesh.load_cube(true);
+        mesh.load_sphere(12, 12, true);
+        // mesh.load_cube(true);
     }
 
     // bind light properties

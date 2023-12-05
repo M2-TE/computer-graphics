@@ -1,12 +1,13 @@
 #pragma once
 #include "transform.hpp"
 #include "material.hpp"
+#include <stdio.h>
 
 struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 norm;
-    glm::vec2 st; // OpenGL-style uv coordinate
-    glm::vec4 vertCol;
+    glm::vec3 pos = glm::vec3(0.0f);
+    glm::vec3 norm = glm::vec3(0.0f);
+    glm::vec2 st = glm::vec2(0.0f); // OpenGL-style uv coordinate
+    glm::vec4 vertCol = glm::vec4(-1.0f);
 };
 
 struct Mesh {
@@ -23,8 +24,72 @@ struct Mesh {
         glDeleteBuffers(buffers.size(), buffers.data());
     }
 
-    void load_sphere(bool bInvertNormals = false) {
-        // TODO
+    void load_sphere(float nSectors, float nStacks, bool bInvertNormals = false) {
+        // https://www.songho.ca/opengl/gl_sphere.html
+        float pi = 3.14159265358979323846f;
+        float radius = 0.5f;
+        // precalc expensive operations
+        float lengthInv = 1.0f / radius;
+        float sectorStep = 2.0f * pi / static_cast<float>(nSectors);
+        float stackStep = pi / static_cast<float>(nStacks);
+
+        // preallocate some space for vertices and indices
+        vertices.reserve((nSectors + 1) * (nStacks + 1));
+        // indices.reserve(vertices.capacity() / 4 * 6 * 3);
+        std::cout << indices.capacity() << std::endl;
+
+        // create vertices
+        for (int i = 0; i <= nStacks; i++) {
+            float stackAngle = pi / 2.0f - static_cast<float>(i) * stackStep;
+            float xy = radius * std::cos(stackAngle);
+            float z = radius * std::sin(stackAngle);
+
+            for (int k = 0; k <= nSectors; k++) {
+                Vertex& vertex = vertices.emplace_back();
+
+                // calculate position
+                float sectorAngle = static_cast<float>(k) * sectorStep;
+                vertex.pos.x = xy * std::cos(sectorAngle);
+                vertex.pos.y = xy * std::sin(sectorAngle);
+                vertex.pos.z = z;
+
+                // calculate normal
+                if (bInvertNormals) vertex.norm = vertex.pos * -lengthInv;
+                else vertex.norm = vertex.pos * lengthInv;
+
+                // calculate uv/st coordinates
+                vertex.st.s = static_cast<float>(k) / nSectors;
+                vertex.st.t = static_cast<float>(i) / nStacks;
+            }
+        }
+
+        // create indices
+        // k1--k1+1
+        // |  / |
+        // | /  |
+        // k2--k2+1
+        for (GLuint i = 0; i < (GLuint)nStacks; i++) {
+            GLuint k1 = i * (nSectors + 1); // beginning of current stack
+            GLuint k2 = k1 + nSectors + 1;  // beginning of next stack
+
+            for (GLuint j = 0; j < (GLuint)nSectors; j++, k1++, k2++) {
+                // 2 triangles per sector excluding first and last stacks
+                if (i != 0) {
+                    indices.insert(indices.end(), {
+                        k1, k2, k1 + 1
+                    });
+                }
+                if (i != nStacks - 1) {
+                    indices.insert(indices.end(), {
+                        k1 + 1, k2, k2 + 1
+                    });
+                }
+            }
+        }
+
+        std::cout << indices.size() << std::endl;
+
+        describe_layout();
     }
     void load_cube(bool bInvertNormals = false) {
         float n = -0.5f; // for readability
@@ -92,8 +157,6 @@ struct Mesh {
                 vertex.vertCol.b = pMesh->mColors[0][i].b;
                 vertex.vertCol.a = pMesh->mColors[0][i].a;
             }
-            // set vertex color to negative if its not present
-            else vertex.vertCol = glm::vec4(-1.0f);
 
             vertices.push_back(vertex);
         }
