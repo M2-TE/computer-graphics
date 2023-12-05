@@ -24,6 +24,7 @@ struct Model {
         flags |= aiProcess_Triangulate; // triangulate all faces if not already triangulated
         flags |= aiProcess_GenNormals; // generate normals if they dont exist
         flags |= aiProcess_FlipUVs; // OpenGL prefers flipped y axis
+        flags |= aiProcess_PreTransformVertices; // simplifies model load
         
         // load model
         importer.SetIOHandler(new CMRC_IOSystem()); // custom virtual IO system

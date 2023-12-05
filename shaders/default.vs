@@ -4,6 +4,7 @@
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 uv;
+layout (location = 3) in vec4 vertCol;
 // output (location matches fragment shader "in")
 layout (location = 0) out vec3 worldPos;
 layout (location = 1) out vec3 normal;

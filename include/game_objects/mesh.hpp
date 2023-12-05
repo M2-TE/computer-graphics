@@ -5,8 +5,11 @@
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 norm;
-    // glm::vec3 
-    glm::vec2 uv;
+    union {
+        glm::vec2 uv;
+        glm::vec2 st;
+    };
+    glm::vec4 vertCol;
 };
 
 struct Mesh {
@@ -40,17 +43,26 @@ struct Mesh {
         for (int i = 0; i < pMesh->mNumVertices; i++) {
             Vertex vertex;
 
-            // extract positions from mVertices
+            // extract positions
             vertex.pos.x = pMesh->mVertices[i].x;
             vertex.pos.y = pMesh->mVertices[i].y;
             vertex.pos.z = pMesh->mVertices[i].z;
-            // extract normals from mNormals
+            // extract normals
             vertex.norm.x = pMesh->mNormals[i].x;
             vertex.norm.y = pMesh->mNormals[i].y;
             vertex.norm.z = pMesh->mNormals[i].z;
-            // extract uv coords from 
-            vertex.uv.x = pMesh->mTextureCoords[0][i].x;
-            vertex.uv.y = pMesh->mTextureCoords[0][i].y;
+            // extract uv/st coords
+            vertex.st.s = pMesh->mTextureCoords[0][i].x;
+            vertex.st.t = pMesh->mTextureCoords[0][i].y;
+            // extract vertex colors (if present)
+            if (pMesh->mColors[0] != nullptr) {
+                vertex.vertCol.r = pMesh->mColors[0][i].r;
+                vertex.vertCol.g = pMesh->mColors[0][i].g;
+                vertex.vertCol.b = pMesh->mColors[0][i].b;
+                vertex.vertCol.a = pMesh->mColors[0][i].a;
+            }
+            // set vertex color to negative if its not present
+            else vertex.vertCol = glm::vec3(-1.0f);
 
             vertices.push_back(vertex);
         }
@@ -90,6 +102,10 @@ struct Mesh {
         glEnableVertexArrayAttrib(vao, i);
         i = 2; // uv coordinate
         glVertexArrayAttribFormat(vao, i, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat));
+        glVertexArrayAttribBinding(vao, i, binding);
+        glEnableVertexArrayAttrib(vao, i);
+        i = 3; // vertex color
+        glVertexArrayAttribFormat(vao, i, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat));
         glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
     }
