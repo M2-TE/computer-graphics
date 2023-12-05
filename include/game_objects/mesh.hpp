@@ -5,10 +5,7 @@
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 norm;
-    union {
-        glm::vec2 uv;
-        glm::vec2 st;
-    };
+    glm::vec2 st; // OpenGL-style uv coordinate
     glm::vec4 vertCol;
 };
 
@@ -26,16 +23,50 @@ struct Mesh {
         glDeleteBuffers(buffers.size(), buffers.data());
     }
 
-    void generate_sphere() {
+    void load_sphere(bool bInvertNormals = false) {
         // TODO
     }
-    void generate_cube() {
+    void load_cube(bool bInvertNormals = false) {
+        float n = -0.5f; // for readability
+        float p = 0.5f; // for readability
         vertices = {
-
+            // pos, norm, uv/st, vertCol
+            {{n, n, p}, {0, 0, +1}, {0, 0}, {1, 1, 1, 1}}, // front
+            {{p, n, p}, {0, 0, +1}, {0, 0}, {1, 1, 1, 1}},
+            {{n, p, p}, {0, 0, +1}, {0, 0}, {1, 1, 1, 1}},
+            {{p, p, p}, {0, 0, +1}, {0, 0}, {1, 1, 1, 1}},
+            {{n, n, n}, {0, 0, -1}, {0, 0}, {1, 1, 1, 1}}, // back
+            {{p, n, n}, {0, 0, -1}, {0, 0}, {1, 1, 1, 1}},
+            {{n, p, n}, {0, 0, -1}, {0, 0}, {1, 1, 1, 1}},
+            {{p, p, n}, {0, 0, -1}, {0, 0}, {1, 1, 1, 1}},
+            {{n, n, n}, {-1, 0, 0}, {0, 0}, {1, 1, 1, 1}}, // left
+            {{n, n, p}, {-1, 0, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{n, p, n}, {-1, 0, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{n, p, p}, {-1, 0, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{p, n, n}, {+1, 0, 0}, {0, 0}, {1, 1, 1, 1}}, // right
+            {{p, n, p}, {+1, 0, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{p, p, n}, {+1, 0, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{p, p, p}, {+1, 0, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{n, p, n}, {0, +1, 0}, {0, 0}, {1, 1, 1, 1}}, // top
+            {{n, p, p}, {0, +1, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{p, p, n}, {0, +1, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{p, p, p}, {0, +1, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{n, n, n}, {0, -1, 0}, {0, 0}, {1, 1, 1, 1}}, // bottom
+            {{n, n, p}, {0, -1, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{p, n, n}, {0, -1, 0}, {0, 0}, {1, 1, 1, 1}},
+            {{p, n, p}, {0, -1, 0}, {0, 0}, {1, 1, 1, 1}},
         };
         indices = {
-
+            0, 1, 3, 3, 2, 0, // front
+            5, 4, 7, 7, 4, 6, // back
+            8, 9, 11, 11, 10, 8, // left
+            13, 12, 15, 15, 12, 14, // right
+            16, 17, 19, 19, 18, 16, // top
+            23, 21, 20, 23, 20, 22, // bottom
         };
+
+        if (bInvertNormals) invert_normals();
+        describe_layout();
     }
     void load_mesh(aiMesh* pMesh) {
         // handle all vertices for this mesh
@@ -62,7 +93,7 @@ struct Mesh {
                 vertex.vertCol.a = pMesh->mColors[0][i].a;
             }
             // set vertex color to negative if its not present
-            else vertex.vertCol = glm::vec3(-1.0f);
+            else vertex.vertCol = glm::vec4(-1.0f);
 
             vertices.push_back(vertex);
         }
@@ -78,7 +109,16 @@ struct Mesh {
 
         // simply assigned the material index for later
         materialIndex = pMesh->mMaterialIndex;
+        describe_layout();
+    }
 
+    void draw() {
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+    }
+
+private:
+    void describe_layout() {
         // describe vertex buffer
         GLsizeiptr nBytes = vertices.size() * sizeof(Vertex);
         glNamedBufferStorage(vbo, nBytes, vertices.data(), 0);
@@ -109,10 +149,10 @@ struct Mesh {
         glVertexArrayAttribBinding(vao, i, binding);
         glEnableVertexArrayAttrib(vao, i);
     }
-
-    void draw() {
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+    void invert_normals() {
+        std::for_each(vertices.begin(), vertices.end(), [](Vertex& vertex) {
+            vertex.norm = vertex.norm * -1.0f;
+        });
     }
 
 public:

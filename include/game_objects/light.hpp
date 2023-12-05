@@ -4,7 +4,7 @@
 struct Light {
     Light(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) 
     : transform(pos, rot, scale) {
-        mesh.generate_cube();
+        mesh.load_cube(true);
     }
 
     // bind light properties
@@ -14,6 +14,7 @@ struct Light {
     }
     // draw the object that represents the light
     void draw() {
+        transform.bind();
         mesh.draw();
     }
 

@@ -21,11 +21,11 @@ struct Transform {
         modelMatrix = glm::scale(modelMatrix, scale);
 
         // calculate normal matrix (only need rotation)
-        glm::mat4x4 normalMatrix(1.0f);
-        normalMatrix = glm::yawPitchRoll(rotation.x, rotation.y, rotation.z);
+        glm::mat3x3 normalMatrix(1.0f);
+        normalMatrix = glm::mat3x3(glm::yawPitchRoll(rotation.x, rotation.y, rotation.z));
 
         glUniformMatrix4fv(0, 1, false, glm::value_ptr(modelMatrix));
-        glUniformMatrix4fv(12, 1, false, glm::value_ptr(normalMatrix));
+        glUniformMatrix3fv(12, 1, false, glm::value_ptr(normalMatrix));
     }
 
     glm::vec3 position;
