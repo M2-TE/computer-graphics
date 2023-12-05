@@ -150,9 +150,9 @@ private:
         glEnableVertexArrayAttrib(vao, i);
     }
     void invert_normals() {
-        std::for_each(vertices.begin(), vertices.end(), [](Vertex& vertex) {
-            vertex.norm = vertex.norm * -1.0f;
-        });
+        for (Vertex& vertex : vertices) {
+            vertex.norm *= -1.0f;
+        }
     }
 
 public:
