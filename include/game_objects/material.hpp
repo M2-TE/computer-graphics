@@ -10,18 +10,19 @@ struct Material {
         glUniform1f(startLocation++, shininess);
         glUniform1f(startLocation++, shininessStrength);
 
-        // the binding index is set in shader by: layout (binding = x)
-        glBindTextureUnit(0, diffuseTexture);
+        if (diffuseTexture < std::numeric_limits<GLuint>().max()) {
+            glBindTextureUnit(0, diffuseTexture);
+        }
     }
 
     glm::vec3 ambient = glm::vec3(0.1f); // first slot
     glm::vec3 diffuse = glm::vec3(1.0f); // second slot
     glm::vec3 specular = glm::vec3(0.0f); // third slot
-    float shininess = 16.0f; // fourth slot
+    float shininess = 32.0f; // fourth slot
     float shininessStrength = 1.0f; // fifth slot
     
     // there can be multiple ambient/diffuse/specular textures at once
     // and they are combined with a blend factor
     // we ignore that for now and use one single texture
-    GLuint diffuseTexture;
+    GLuint diffuseTexture = std::numeric_limits<GLuint>().max();
 };

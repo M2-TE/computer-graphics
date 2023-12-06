@@ -6,8 +6,8 @@
 struct Vertex {
     glm::vec3 pos = glm::vec3(0.0f);
     glm::vec3 norm = glm::vec3(0.0f);
-    glm::vec2 st = glm::vec2(0.0f); // OpenGL-style uv coordinate
-    glm::vec4 vertCol = glm::vec4(-1.0f);
+    glm::vec2 st = glm::vec2(0.0f); // uv-coord
+    glm::vec4 col = glm::vec4(0.0f);
 };
 
 struct Mesh {
@@ -56,8 +56,9 @@ struct Mesh {
                 else vertex.norm = vertex.pos * lengthInv;
 
                 // calculate uv/st coordinates
-                vertex.st.s = static_cast<float>(k) / nSectors;
-                vertex.st.t = static_cast<float>(i) / nStacks;
+                // vertex.st.s = static_cast<float>(k) / nSectors;
+                // vertex.st.t = static_cast<float>(i) / nStacks;
+                vertex.col = glm::vec4(1, 1, 1, 1);
             }
         }
 
@@ -91,7 +92,7 @@ struct Mesh {
         float n = -0.5f; // for readability
         float p = 0.5f; // for readability
         vertices = {
-            // pos, norm, uv/st, vertCol
+            // pos, norm, uv/st, col
             {{n, n, p}, {0, 0, +1}, {0, 0}, {1, 1, 1, 1}}, // front
             {{p, n, p}, {0, 0, +1}, {0, 0}, {1, 1, 1, 1}},
             {{n, p, p}, {0, 0, +1}, {0, 0}, {1, 1, 1, 1}},
@@ -148,10 +149,10 @@ struct Mesh {
             vertex.st.t = pMesh->mTextureCoords[0][i].y;
             // extract vertex colors (if present)
             if (pMesh->mColors[0] != nullptr) {
-                vertex.vertCol.r = pMesh->mColors[0][i].r;
-                vertex.vertCol.g = pMesh->mColors[0][i].g;
-                vertex.vertCol.b = pMesh->mColors[0][i].b;
-                vertex.vertCol.a = pMesh->mColors[0][i].a;
+                vertex.col.r = pMesh->mColors[0][i].r;
+                vertex.col.g = pMesh->mColors[0][i].g;
+                vertex.col.b = pMesh->mColors[0][i].b;
+                vertex.col.a = pMesh->mColors[0][i].a;
             }
 
             vertices.push_back(vertex);

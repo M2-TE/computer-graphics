@@ -4,6 +4,7 @@
 layout (location = 0) in vec3 worldPos;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 uvCoord;
+layout (location = 3) in vec4 vertCol;
 // output
 layout (location = 0) out vec4 pixelColor;
 
@@ -18,6 +19,7 @@ struct Material {
     vec3 specular; // third slot
     float shininess; // fourth slot
     float shininessStrength; // fifth slot
+    uint bSampleDiffuse; // sixth slot
 };
 
 // Material needs multiple slots

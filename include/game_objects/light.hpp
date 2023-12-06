@@ -4,8 +4,7 @@
 struct Light {
     Light(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) 
     : transform(pos, rot, scale) {
-        mesh.load_sphere(12, 12, true);
-        // mesh.load_cube(true);
+        mesh.load_sphere(36, 36, true);
     }
 
     // bind light properties
@@ -16,11 +15,12 @@ struct Light {
     // draw the object that represents the light
     void draw() {
         transform.bind();
+        material.bind();
         mesh.draw();
     }
 
-    Transform transform;
     glm::vec3 lightColor = glm::vec3(.992f, .984f, .827f);
-private:
+    Transform transform;
+    Material material;
     Mesh mesh;
 };
