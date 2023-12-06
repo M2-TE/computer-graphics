@@ -17,9 +17,9 @@ struct Material {
     vec3 ambient; // first slot
     vec3 diffuse; // second slot
     vec3 specular; // third slot
-    float shininess; // fourth slot
-    float shininessStrength; // fifth slot
-    uint bSampleDiffuse; // sixth slot
+    float shininess; // etc
+    float shininessStrength;
+    float diffuseBlend;
 };
 
 // Material needs multiple slots
@@ -47,11 +47,12 @@ void main() {
     specularStrength *= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
     vec3 specularColor = lightColor * specularStrength * material.specular;
 
-    // final color
-    vec3 color = texture(diffuseTexture, uvCoord).rgb; // sample texture
-    // vec3 color = vec3(1.0f, 1.0f, 1.0f); // sample texture
-    color = color * (ambientColor + diffuseColor + specularColor); // combine light colors
+    // final color (blend vertex color with texture color)
+    vec4 sampledColor = texture(diffuseTexture, uvCoord);
+    vec4 color = mix(vertCol, sampledColor, material.diffuseBlend);
+    // combine with light colors
+    color = vec4(color.rgb * (ambientColor + diffuseColor + specularColor), color.a);
 
     // write to screen
-    pixelColor = vec4(color, 1.0);
+    pixelColor = color;
 }

@@ -95,6 +95,7 @@ struct Model {
             // load diffuse texture
             if (pMaterial->GetTextureCount(aiTextureType_DIFFUSE)) {
                 material.diffuseTexture = get_texture(pMaterial, aiTextureType_DIFFUSE);
+                material.diffuseBlend = 1.0f;
             }
         }
 
