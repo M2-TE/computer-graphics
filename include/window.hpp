@@ -10,7 +10,7 @@ struct Window {
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MINOR_VERSION, 6); // adjust
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_DOUBLEBUFFER, 1);
         if (nSamples > 1) {
-            assert((n & (n - 1)) == 0); // check if nSamples is power of two
+            assert((nSamples & (nSamples - 1)) == 0); // check if nSamples is power of two
             SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLEBUFFERS, 1); // enable multisampling
             SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLESAMPLES, nSamples); // set number of samples per pixel
         }

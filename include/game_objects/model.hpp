@@ -157,8 +157,21 @@ private:
         glCreateTextures(GL_TEXTURE_2D, 1, &texture);
         glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
         glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // set wrapping parameters
+        glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        // // mip-maps
+        // glGenerateTextureMipmap(texture);
+        // glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        // glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // // anisotropic filtering
+        // GLfloat anisotropicFiltering;
+        // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropicFiltering);
+        // std::min(anisotropicFiltering, 8.0f);
+        // glTextureParameterf(texture, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
         return texture;
     }
 
