@@ -162,16 +162,16 @@ private:
         glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-        // // mip-maps
-        // glGenerateTextureMipmap(texture);
-        // glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        // glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // mip-maps
+        glGenerateTextureMipmap(texture);
+        glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        // // anisotropic filtering
-        // GLfloat anisotropicFiltering;
-        // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropicFiltering);
-        // std::min(anisotropicFiltering, 8.0f);
-        // glTextureParameterf(texture, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
+        // anisotropic filtering
+        GLfloat anisotropicFiltering;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropicFiltering);
+        std::min(anisotropicFiltering, 8.0f);
+        glTextureParameterf(texture, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
         return texture;
     }
 
