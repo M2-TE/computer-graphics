@@ -1,7 +1,7 @@
 #pragma once
 
 struct Window {
-    Window(int window_width, int window_height) : width(window_width), height(window_height) {
+    Window(int window_width, int window_height, int nSamples) : width(window_width), height(window_height) {
         if (SDL_InitSubSystem(SDL_InitFlags::SDL_INIT_VIDEO)) std::cout << SDL_GetError();
 
         // set opengl version
@@ -9,6 +9,11 @@ struct Window {
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MAJOR_VERSION, 4); // adjust
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MINOR_VERSION, 6); // adjust
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_DOUBLEBUFFER, 1);
+        if (nSamples > 1) {
+            assert((n & (n - 1)) == 0); // check if nSamples is power of two
+            SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLEBUFFERS, 1); // enable multisampling
+            SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLESAMPLES, nSamples); // set number of samples per pixel
+        }
 
         #ifndef NDEBUG
         // only enable explicit logging in debug mode
@@ -16,6 +21,7 @@ struct Window {
         #endif
 
         // create OpenGL window
+        // SDL_GL_MULTISAMPLEBUFFERS
         pWindow = SDL_CreateWindow("OpenGL Renderer", width, height, SDL_WindowFlags::SDL_WINDOW_OPENGL);
         if (pWindow == nullptr) std::cout << SDL_GetError();
 
@@ -41,6 +47,15 @@ struct Window {
         glEnable(GL_DEPTH_TEST); // enable depth buffer and depth testing
         SDL_SetRelativeMouseMode(SDL_TRUE); // capture mouse for better camera controls
         SDL_GL_SetSwapInterval(1); // vsync
+
+        if (nSamples > 1) {
+            glEnable(GL_MULTISAMPLE);
+            glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+        }
+
+        // color blending via fragment shader's alpha value
+        // glEnable(GL_BLEND); // color blending for proper transparency
+        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // define function for blending colors
     }
     ~Window() {
         SDL_Quit();

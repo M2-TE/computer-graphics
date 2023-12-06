@@ -27,7 +27,6 @@ layout (location = 20) uniform Material material;
 layout (binding = 0) uniform sampler2D diffuseTexture;
 
 void main() {
-
     // create our "sun"
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
 
@@ -47,11 +46,22 @@ void main() {
     specularStrength *= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
     vec3 specularColor = lightColor * specularStrength * material.specular;
 
-    // final color (blend vertex color with texture color)
+    // final color (blend/interpolate vertex color with texture color)
     vec4 sampledColor = texture(diffuseTexture, uvCoord);
     vec4 color = mix(vertCol, sampledColor, material.diffuseBlend);
     // combine with light colors
     color = vec4(color.rgb * (ambientColor + diffuseColor + specularColor), color.a);
+
+    // lazy (and very efficient) alpha blending
+    // can glDisable(GL_BLENDING) for this
+    // if (color.a < 0.5) {
+    //     discard; // discard current fragment/pixel
+    // }
+
+    // see if there are any alpha values between 0.1 and 0.9
+    // if (color.a > 0.1 && color.a < 0.9) {
+    //     color.rgb = vec3(1, 1, 1);
+    // }
 
     // write to screen
     pixelColor = color;

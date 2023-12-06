@@ -45,7 +45,7 @@ struct App {
             
             // now draw all the models
             light.draw();
-            model.draw();
+            model.draw(camera.position);
             // ...
             // ...
 
@@ -83,7 +83,7 @@ private:
 private:
     Input input;
     Timer timer;
-    Window window = Window(1280, 720);
+    Window window = Window(1280, 720, 4);
     Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Camera camera = Camera({1, 1, 1}, {0, 0, 0}, window.width, window.height);
     Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");

@@ -101,7 +101,7 @@ struct Model {
 
     }
 
-    void draw() {
+    void draw(glm::vec3& cameraPosition) {
         transform.bind();
         for (int i = 0; i < meshes.size(); i++) {
             Material& material = materials[meshes[i].materialIndex];
@@ -129,10 +129,7 @@ private:
         if (pImage == nullptr) std::cerr << "failed to load model texture" << std::endl;
 
         // create texture
-        GLuint texture;
-        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-        glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
-        glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
+        GLuint texture = create_gl_tex(pImage, width, height);
         stbi_image_free(pImage);
 
         // add texture to our lookup map
@@ -147,15 +144,21 @@ private:
         if (pImage == nullptr) std::cerr << "failed to load embedded model texture" << std::endl;
 
         // create texture
-        GLuint texture;
-        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
-        glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
-        glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
+        GLuint texture = create_gl_tex(pImage, width, height);
         stbi_image_free(pImage);
 
         // add texture to our lookup map
         textures[pTexture->mFilename.C_Str()] = texture;
 
+        return texture;
+    }
+    GLuint create_gl_tex(void* pImage, int width, int height) {
+        GLuint texture;
+        glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+        glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
+        glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         return texture;
     }
 
