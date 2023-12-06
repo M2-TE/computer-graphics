@@ -29,6 +29,8 @@ static inline std::pair<const unsigned char*, std::size_t> load_image(const std:
     }
 }
 
+// simplifies loading of models
+#ifdef EMBEDDED_MODELS
 CMRC_DECLARE(models);
 static inline std::pair<const unsigned char*, std::size_t> load_model_resource(const std::string& path) {
     auto fs = cmrc::models::get_filesystem();
@@ -37,10 +39,23 @@ static inline std::pair<const unsigned char*, std::size_t> load_model_resource(c
         return { reinterpret_cast<const unsigned char*>(file.cbegin()), file.size() };
     }
     else {
-        std::cerr << "Unable to load model: " << path << std::endl;
+        std::cerr << "Unable to load model resource: " << path << std::endl;
         return { nullptr, 0 };
     }
 }
+#else
+static inline std::pair<const unsigned char*, std::size_t> load_model_resource(const std::string& path) {
+    std::size_t nBytes;
+    const void* pData = SDL_LoadFile(path.c_str(), &nBytes);
+    if (pData != nullptr){
+        return { reinterpret_cast<const unsigned char*>(pData), nBytes };
+    } 
+    else {
+        std::cerr << "Unable to load model resource: " << path << std::endl;
+        return { nullptr, 0 };
+    }
+}
+#endif
 
 // reports information about potential OpenGL API misuse
 static void openglCallbackFunction(

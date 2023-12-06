@@ -1,4 +1,5 @@
 #pragma once
+#ifdef EMBEDDED_MODELS
 #include <assimp/IOStream.hpp>
 #include <assimp/IOSystem.hpp>
 #include <cmrc/cmrc.hpp>
@@ -102,3 +103,4 @@ public:
 private:
     cmrc::embedded_filesystem fs;
 };
+#endif

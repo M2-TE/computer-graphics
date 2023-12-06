@@ -27,36 +27,26 @@ struct Model {
         flags |= aiProcess_PreTransformVertices; // simplifies model load
         
         // load model
-        importer.SetIOHandler(new CMRC_IOSystem()); // custom virtual IO system
+        #ifdef EMBEDDED_MODELS
+        importer.SetIOHandler(new CMRC_IOSystem()); // custom virtual IO system for embedded resources
+        #else
+        path = "../" + path; // adjust path when reading from disk
+        #endif
         const aiScene* pScene = importer.ReadFile(path, flags);
-        if (pScene == nullptr) std::cerr << importer.GetErrorString() << '\n';
+        if (pScene == nullptr) {
+            std::cerr << importer.GetErrorString() << '\n';
+            return;
+        }
         else std::cout << "Loaded model: " << path << std::endl;
 
         // we need to figure out the path the root of a model for formats such as .obj
         size_t sepIndex = path.find_last_of('/');
         modelRoot = path.substr(0, sepIndex + 1);
 
-
-        // TESTING
-        // path = std::string("../").append(path);
-        // importer.SetIOHandler(nullptr);
-        // const aiScene* pScene2 = importer.ReadFile(path, flags);
-        // if (pScene2 == nullptr) std::cerr << importer.GetErrorString() << '\n';
-        // else std::cout << "Loaded model: " << path << std::endl;
-        // std::cout 
-        //     << "Meshes: " << pScene2->mNumMeshes << '\n'
-        //     << "Materials " << pScene2->mNumMaterials << '\n'
-        //     << "Textures: " << pScene2->mNumTextures << '\n';
-
         // prepare for data storage
         meshes.reserve(pScene->mNumMeshes);
         textures.reserve(pScene->mNumTextures);
         materials.resize(pScene->mNumMaterials);
-
-        std::cout
-            << "Meshes: " << pScene->mNumMeshes << '\n'
-            << "Materials " << pScene->mNumMaterials << '\n'
-            << "Textures: " << pScene->mNumTextures << '\n';
 
         // create meshes
         for (int i = 0; i < pScene->mNumMeshes; i++) {
