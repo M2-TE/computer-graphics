@@ -1,5 +1,6 @@
 #include <glbinding/gl46core/gl.h>
 #include <glbinding/glbinding.h>
+#include <glbinding/AbstractFunction.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <iostream>
@@ -37,13 +38,40 @@ Window::Window(int window_width, int window_height, int nSamples) : width(window
     // set up glbinding loader (lazy loading)
     glbinding::initialize(SDL_GL_GetProcAddress, false);
 
-    #ifndef NDEBUG
-    // only enable explicit logging in debug mode
-    // glEnable(GL_DEBUG_OUTPUT);
-    // glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    // glDebugMessageCallback(openglCallbackFunction, nullptr);
-    // glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
-    #endif
+    // error logging (currently enabled in release mode as well)
+    glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue, { "glGetError" });
+    glbinding::setAfterCallback([](const glbinding::FunctionCall& call) {
+        const auto errorCode = glGetError();
+        if (errorCode != GL_NO_ERROR)
+        {
+            // print out the function name, parameters and return value
+            std::cout << call.function->name() << '(';
+            for (unsigned i = 0; i < call.parameters.size(); ++i) {
+                std::cout << call.parameters[i].get();
+                if (i < call.parameters.size() - 1)
+                    std::cout << ", ";
+            }
+            std::cout << ')';
+            if (call.returnValue) {
+                std::cout << " -> " << call.returnValue.get();
+            }
+            std::cout << '\n';
+
+            // print out error code
+            std::string error;
+            switch (errorCode)
+            {
+                case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+                case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+                case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+                case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+                case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+                case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+                case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+            }
+            std::cout << "\tError: " << error << std::endl;
+        }
+    });
 
     glViewport(0, 0, width, height); // set viewport size
     glClearColor(.5f, .5f, .5f, 1.0f); // default screen color
