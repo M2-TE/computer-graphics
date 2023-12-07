@@ -181,10 +181,10 @@ private:
     void describe_layout() {
         // describe vertex buffer
         GLsizeiptr nBytes = vertices.size() * sizeof(Vertex);
-        glNamedBufferStorage(vbo, nBytes, vertices.data(), 0);
+        glNamedBufferStorage(vbo, nBytes, vertices.data(), BufferStorageMask::GL_NONE_BIT);
         // describe index buffer
         nBytes = indices.size() * sizeof(GLuint);
-        glNamedBufferStorage(ebo, nBytes, indices.data(), 0);
+        glNamedBufferStorage(ebo, nBytes, indices.data(), BufferStorageMask::GL_NONE_BIT);
 
         // describe buffer contents
         glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex));

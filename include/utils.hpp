@@ -44,6 +44,7 @@ static inline std::pair<const unsigned char*, std::size_t> load_model_resource(c
     }
 }
 #else
+#include <SDL.h> // could try not to depend on this for faster compilation
 static inline std::pair<const unsigned char*, std::size_t> load_model_resource(const std::string& path) {
     std::size_t nBytes;
     const void* pData = SDL_LoadFile(path.c_str(), &nBytes);
@@ -56,15 +57,3 @@ static inline std::pair<const unsigned char*, std::size_t> load_model_resource(c
     }
 }
 #endif
-
-// reports information about potential OpenGL API misuse
-static void openglCallbackFunction(
-    GLenum source, GLenum type, GLuint id, 
-    GLenum severity,  GLsizei length,
-    const GLchar* message, const void* userParam) {
-    fprintf(stderr, "%s\n", message);
-    if (severity==GL_DEBUG_SEVERITY_HIGH) {
-        fprintf(stderr, "Aborting...\n");
-        abort();
-    }
-}

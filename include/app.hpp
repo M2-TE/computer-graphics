@@ -1,13 +1,12 @@
 #pragma once
-
 // External libraries
-#include <glad/gl.h>
-#include <SDL.h>
-#include <SDL_opengl.h>
+#include <glbinding/gl46core/gl.h>
+#include <glbinding/glbinding.h>
 // C++ standard library
 #include <vector>
 #include <iostream>
 // Project-local headers
+using namespace gl;
 #include "utils.hpp"
 #include "window.hpp"
 #include "pipeline.hpp"
@@ -49,7 +48,7 @@ struct App {
             // ...
             // ...
 
-            SDL_GL_SwapWindow(window.pWindow);
+            window.swap();
         }
 
         return 0;
