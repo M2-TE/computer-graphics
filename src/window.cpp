@@ -34,8 +34,8 @@ Window::Window(int window_width, int window_height, int nSamples) : width(window
     context = SDL_GL_CreateContext(pWindow);
     if (context == nullptr) std::cout << SDL_GetError();
 
-    // set up glbinding loader
-    glbinding::initialize(SDL_GL_GetProcAddress);
+    // set up glbinding loader (lazy loading)
+    glbinding::initialize(SDL_GL_GetProcAddress, false);
 
     #ifndef NDEBUG
     // only enable explicit logging in debug mode
