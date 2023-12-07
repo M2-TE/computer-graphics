@@ -59,8 +59,7 @@ Window::Window(int window_width, int window_height, int nSamples) : width(window
 
             // print out error code
             std::string error;
-            switch (errorCode)
-            {
+            switch (errorCode) {
                 case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
                 case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
                 case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
