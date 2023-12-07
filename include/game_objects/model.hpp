@@ -170,7 +170,7 @@ private:
         // anisotropic filtering
         GLfloat anisotropicFiltering;
         glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropicFiltering);
-        std::min(anisotropicFiltering, 8.0f);
+        anisotropicFiltering = std::min(anisotropicFiltering, 8.0f);
         glTextureParameterf(texture, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
         return texture;
     }
