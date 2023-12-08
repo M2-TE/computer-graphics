@@ -2,6 +2,7 @@
 // External libraries
 #include <glbinding/gl46core/gl.h>
 #include <glbinding/glbinding.h>
+#include <SDL.h>
 // C++ standard library
 #include <vector>
 #include <iostream>
@@ -64,7 +65,7 @@ private:
         if (input.get_key_pressed(SDL_KeyCode::SDLK_ESCAPE)) SDL_SetRelativeMouseMode(!SDL_GetRelativeMouseMode());
 
         // camera movement
-        float movementSpeed = timer.get_delta() * 2.0f;
+        float movementSpeed = timer.get_delta() * 2.0f; // scale speed relative to framerate
         if (input.get_key_down(SDL_KeyCode::SDLK_LSHIFT)) movementSpeed *= 3.0f; // sprint button
         if (input.get_key_down(SDL_KeyCode::SDLK_s)) camera.translate(0.0f, 0.0f, movementSpeed);
         if (input.get_key_down(SDL_KeyCode::SDLK_w)) camera.translate(0.0f, 0.0f, -movementSpeed);

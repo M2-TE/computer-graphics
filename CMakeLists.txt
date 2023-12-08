@@ -5,6 +5,8 @@ project(opengl-renderer)
 # Global
 set(PREFER_EMBED_MODELS             OFF CACHE BOOL "Prefer embedding models into executable" FORCE)
 set(PREFER_SHARED                   ON  CACHE BOOL "Prefer shared libraries for faster build times" FORCE)
+set(BUILD_SHARED_LIBS               ${PREFER_SHARED} CACHE BOOL "Build shared instead of static libraries." FORCE)
+set(OPTION_BUILD_WITH_LTO           ${PREFER_SHARED} CACHE BOOL "Build with Link-time Optimization" FORCE)
 # SDL3
 set(SDL_SHARED                      ON  CACHE BOOL "Build SDL as shared lib" FORCE)
 set(SDL_STATIC                      OFF CACHE BOOL "Build SDL as static lib" FORCE)
@@ -28,7 +30,6 @@ set(SDL_SENSOR                      OFF CACHE BOOL "Disable SDL Sensor subsystem
 set(SDL_LOCALE                      ON  CACHE BOOL "Disable SDL Locale subsystem" FORCE)
 set(SDL_MISC                        ON  CACHE BOOL "Disable SDL Misc subsystem" FORCE)
 # assimp
-set(BUILD_SHARED_LIBS  ${PREFER_SHARED} CACHE BOOL "Build ASSIMP as shared lib" FORCE)
 set(ASSIMP_BUILD_TESTS              OFF CACHE BOOL "Build ASSIMP tests" FORCE)
 set(ASSIMP_INSTALL                  OFF CACHE BOOL "Enable ASSIMP install" FORCE)
 set(ASSIMP_BUILD_ASSIMP_VIEW        OFF CACHE BOOL "Build ASSIMP viewer" FORCE)
@@ -36,7 +37,6 @@ set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE BOOL "Build all ASSIMP expor
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "Build all ASSIMP importers" FORCE)
 set(ASSIMP_BUILD_OBJ_IMPORTER       ON CACHE BOOL "Enable .obj importer" FORCE)
 # glbinding
-set(BUILD_SHARED_LIBS  ${PREFER_SHARED} CACHE BOOL "Build shared instead of static libraries." FORCE)
 set(OPTION_SELF_CONTAINED           OFF CACHE BOOL "Create a self-contained install with all dependencies." FORCE)
 set(OPTION_BUILD_TESTS              OFF CACHE BOOL "Build tests." FORCE)
 set(OPTION_BUILD_DOCS               OFF CACHE BOOL "Build documentation." FORCE)
@@ -45,7 +45,6 @@ set(OPTION_BUILD_EXAMPLES           OFF CACHE BOOL "Build examples." FORCE)
 set(OPTION_BUILD_WITH_BOOST_THREAD  OFF CACHE BOOL "Use boost::thread instead of std::thread." FORCE)
 set(OPTION_BUILD_CHECK              OFF CACHE BOOL "Enable source code check targets" FORCE)
 set(OPTION_BUILD_OWN_KHR_HEADERS    OFF CACHE BOOL "Build and deploy glbinding with in-source KHR headers." FORCE)
-set(OPTION_BUILD_WITH_LTO           ON  CACHE BOOL "Build with Link-time Optimization (may break AppleClang)" FORCE)
 set(OPTION_USE_GIT_INFORMATION      ON  CACHE BOOL "Fetches commit information from the git source repository" FORCE)
 # Misc
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -79,7 +78,6 @@ target_link_libraries(${PROJECT_NAME} glm) # OpenGL math library
 target_link_libraries(${PROJECT_NAME} SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL) # OpenGL headers
 target_link_libraries(${PROJECT_NAME} glbinding::glbinding) # OpenGL function loader
-target_link_libraries(${PROJECT_NAME} glbinding::glbinding-aux) # OpenGL utils
 target_link_libraries(${PROJECT_NAME} assimp stb-image) # model/image loading
 target_link_libraries(${PROJECT_NAME} shaders images) # CMRC embedded files
 
@@ -88,5 +86,5 @@ if (${PREFER_EMBED_MODELS})
     file(GLOB_RECURSE model-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "models/*")
     cmrc_add_resource_library(models "${model-files}") # embed models into library "models"
     target_link_libraries(${PROJECT_NAME} models)
-    target_compile_definitions({$PROJECT_NAME} EMBEDDED_MODELS=1)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE EMBEDDED_MODELS=1)
 endif()

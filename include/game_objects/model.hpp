@@ -123,10 +123,17 @@ private:
         // load texture from memory using stbi
         std::string texPath(modelRoot);
         texPath.append(aiTexPath.C_Str());
-        auto rawTex = load_model_resource(texPath);
         int width, height, nChannels;
+        #ifdef EMBEDDED_MODELS
+        auto rawTex = load_model_resource(texPath);
         stbi_uc* pImage = stbi_load_from_memory(rawTex.first, rawTex.second, &width, &height, &nChannels, 4);
-        if (pImage == nullptr) std::cerr << "failed to load model texture" << std::endl;
+        #else
+        stbi_uc* pImage = stbi_load(texPath.c_str(), &width, &height, &nChannels, 4);
+        #endif
+        if (pImage == nullptr) {
+            std::cerr << "failed to load model texture" << std::endl;
+            return 0;
+        }
 
         // create texture
         GLuint texture = create_gl_tex(pImage, width, height);

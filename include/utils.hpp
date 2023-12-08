@@ -43,17 +43,4 @@ static inline std::pair<const unsigned char*, std::size_t> load_model_resource(c
         return { nullptr, 0 };
     }
 }
-#else
-#include <SDL.h> // could try not to depend on this for faster compilation
-static inline std::pair<const unsigned char*, std::size_t> load_model_resource(const std::string& path) {
-    std::size_t nBytes;
-    const void* pData = SDL_LoadFile(path.c_str(), &nBytes);
-    if (pData != nullptr){
-        return { reinterpret_cast<const unsigned char*>(pData), nBytes };
-    } 
-    else {
-        std::cerr << "Unable to load model resource: " << path << std::endl;
-        return { nullptr, 0 };
-    }
-}
 #endif

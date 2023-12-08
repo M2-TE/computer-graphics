@@ -37,7 +37,6 @@ Window::Window(int window_width, int window_height, int nSamples) : width(window
 
     // set up glbinding loader (lazy loading)
     glbinding::initialize(SDL_GL_GetProcAddress, false);
-
     // error logging (currently enabled in release mode as well)
     glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue, { "glGetError" });
     glbinding::setAfterCallback([](const glbinding::FunctionCall& call) {
@@ -48,13 +47,10 @@ Window::Window(int window_width, int window_height, int nSamples) : width(window
             std::cout << call.function->name() << '(';
             for (unsigned i = 0; i < call.parameters.size(); ++i) {
                 std::cout << call.parameters[i].get();
-                if (i < call.parameters.size() - 1)
-                    std::cout << ", ";
+                if (i < call.parameters.size() - 1) std::cout << ", ";
             }
             std::cout << ')';
-            if (call.returnValue) {
-                std::cout << " -> " << call.returnValue.get();
-            }
+            if (call.returnValue) std::cout << " -> " << call.returnValue.get();
             std::cout << '\n';
 
             // print out error code
