@@ -18,10 +18,6 @@ using namespace gl;
 #include "game_objects/camera.hpp"
 
 struct App {
-    App() {
-        
-    }
-
     int run() {
         while(bRunning) {
             input.flush(); // flush input from last frame

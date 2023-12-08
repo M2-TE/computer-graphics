@@ -47,11 +47,12 @@ set(OPTION_BUILD_CHECK              OFF CACHE BOOL "Enable source code check tar
 set(OPTION_BUILD_OWN_KHR_HEADERS    OFF CACHE BOOL "Build and deploy glbinding with in-source KHR headers." FORCE)
 set(OPTION_USE_GIT_INFORMATION      ON  CACHE BOOL "Fetches commit information from the git source repository" FORCE)
 # Misc
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 FetchContent_Declare(sdl3 GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git" GIT_TAG "main")
@@ -78,7 +79,7 @@ target_link_libraries(${PROJECT_NAME} glm) # OpenGL math library
 target_link_libraries(${PROJECT_NAME} SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL) # OpenGL headers
 target_link_libraries(${PROJECT_NAME} glbinding::glbinding) # OpenGL function loader
-target_link_libraries(${PROJECT_NAME} assimp stb-image) # model/image loading
+target_link_libraries(${PROJECT_NAME} assimp stb::image) # model/image loading
 target_link_libraries(${PROJECT_NAME} shaders images) # CMRC embedded files
 
 # only embed models with CMRC if desired
