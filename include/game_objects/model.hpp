@@ -43,18 +43,15 @@ struct Model {
         size_t sepIndex = path.find_last_of('/');
         modelRoot = path.substr(0, sepIndex + 1);
 
-        // prepare for data storage
-        meshes.reserve(pScene->mNumMeshes);
-        textures.reserve(pScene->mNumTextures);
-        materials.resize(pScene->mNumMaterials);
-
         // create meshes
+        meshes.reserve(pScene->mNumMeshes);
         for (int i = 0; i < pScene->mNumMeshes; i++) {
             aiMesh* pMesh = pScene->mMeshes[i];
             meshes.emplace_back(pMesh);
         }
 
-        // create textures (if embedded into model, such as .fbx)
+        // create textures (if embedded into model, such as .glb)
+        textures.reserve(pScene->mNumTextures);
         for (int i = 0; i < pScene->mNumTextures; i++) {
             aiTexture* pTexture = pScene->mTextures[i];
             GLuint texture;
@@ -68,27 +65,19 @@ struct Model {
 
         // create materials
         // https://assimp.sourceforge.net/lib_html/materials.html
+        materials.resize(pScene->mNumMaterials);
         for (int i = 0; i < pScene->mNumMaterials; i++) {
             aiMaterial* pMaterial = pScene->mMaterials[i];
             Material& material = materials[i];
             aiColor3D color;
 
-            // Ambient Color
+            // Load basic material properties
             pMaterial->Get(AI_MATKEY_COLOR_AMBIENT, color);
-            material.ambient.r = color.r;
-            material.ambient.g = color.g;
-            material.ambient.b = color.b;
-            // Diffuse Color
+            material.ambient = { color.r, color.g, color.b };
             pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-            material.diffuse.r = color.r;
-            material.diffuse.g = color.g;
-            material.diffuse.b = color.b;
-            // Specular Color
+            material.diffuse = { color.r, color.g, color.b };
             pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, color);
-            material.specular.r = color.r;
-            material.specular.g = color.g;
-            material.specular.b = color.b;
-            // Shininess and its strength
+            material.specular = { color.r, color.g, color.b };
             pMaterial->Get(AI_MATKEY_SHININESS, material.shininess);
             pMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, material.shininessStrength);
 
