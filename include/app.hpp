@@ -83,7 +83,7 @@ private:
 private:
     Input input;
     Timer timer;
-    Window window = Window(1280, 720, 4);
+    Window window = Window(1280, 720, 1);
     Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Camera camera = Camera({1, 1, 1}, {0, 0, 0}, window.width, window.height);
     Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");
