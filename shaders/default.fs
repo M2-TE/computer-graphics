@@ -51,6 +51,17 @@ void main() {
     vec4 color = mix(vertCol, sampledColor, material.diffuseBlend);
     // combine with light colors
     color = vec4(color.rgb * (ambientColor + diffuseColor + specularColor), color.a);
+    
+    // lazy (and very efficient) alpha blending
+    // can glDisable(GL_BLENDING) for this
+    // if (color.a < 0.5) {
+    //     discard; // discard current fragment/pixel
+    // }
+
+    // see if there are any alpha values between 0.1 and 0.9
+    // if (color.a > 0.1 && color.a < 0.9) {
+    //     color.rgb = vec3(1, 1, 1);
+    // }
 
     // write to screen
     pixelColor = color;

@@ -15,6 +15,12 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
     SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MAJOR_VERSION, 4); // adjust
     SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MINOR_VERSION, 6); // adjust
     SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_DOUBLEBUFFER, 1);
+    if (nSamples > 1) { // set up multisampling capabilities
+        if ((nSamples & (nSamples - 1))) std::cerr << "Multisample samples need to be a power of two" << std::endl;
+        // assert((nSamples & (nSamples - 1)) == 0); // check if nSamples is power of two
+        SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLEBUFFERS, 1); // enable multisampling
+        SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLESAMPLES, nSamples); // set number of samples per pixel
+    }
 
     #ifndef NDEBUG
     // only enable explicit logging in debug mode
@@ -69,6 +75,14 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
     glEnable(GL_DEPTH_TEST); // enable depth buffer and depth testing
     SDL_SetRelativeMouseMode(SDL_TRUE); // capture mouse for better camera controls
     SDL_GL_SetSwapInterval(1); // vsync
+    if (nSamples > 1) {
+        glEnable(GL_MULTISAMPLE);  // enable multisampling application-wide
+        glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE); // enable color blending via multisampling
+    }
+
+    // color blending via fragment shader's alpha value
+    // glEnable(GL_BLEND); // color blending for proper transparency
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // define function for blending colors
 }
 Window::~Window() {
     SDL_Quit();
