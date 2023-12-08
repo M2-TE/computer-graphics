@@ -7,7 +7,7 @@
 #include <cassert>
 #include "window.hpp"
 
-Window::Window(int window_width, int window_height, int samples) : width(window_width), height(window_height) {
+Window::Window(int window_width, int window_height, int nSamples) : width(window_width), height(window_height) {
     if (SDL_InitSubSystem(SDL_InitFlags::SDL_INIT_VIDEO)) std::cout << SDL_GetError();
 
     // set opengl version
