@@ -10,9 +10,6 @@
 #include "material.hpp"
 #include "cmrc_io.hpp"
 
-// sample models:
-// https://github.com/assimp/assimp-mdb
-// model used here:
 // https://github.com/jimmiebergmann/Sponza
 struct Model {
     Model(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale, std::string path)
@@ -89,7 +86,6 @@ struct Model {
         }
 
     }
-
     void draw(glm::vec3& cameraPosition) {
         transform.bind();
         for (int i = 0; i < meshes.size(); i++) {

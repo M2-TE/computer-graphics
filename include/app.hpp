@@ -42,9 +42,8 @@ struct App {
             // now draw all the models
             light.draw();
             model.draw(camera.position);
-            // ...
-            // ...
-
+            
+            // present drawn frame to the screen
             window.swap();
         }
 
