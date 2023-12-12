@@ -17,7 +17,6 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
     SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_DOUBLEBUFFER, 1);
     if (nSamples > 1) { // set up multisampling capabilities
         if ((nSamples & (nSamples - 1))) std::cerr << "Multisample samples need to be a power of two" << std::endl;
-        // assert((nSamples & (nSamples - 1)) == 0); // check if nSamples is power of two
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLEBUFFERS, 1); // enable multisampling
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLESAMPLES, nSamples); // set number of samples per pixel
     }
