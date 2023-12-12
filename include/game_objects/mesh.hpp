@@ -145,10 +145,12 @@ struct Mesh {
             vertex.norm.y = pMesh->mNormals[i].y;
             vertex.norm.z = pMesh->mNormals[i].z;
             // extract uv/st coords
-            vertex.st.s = pMesh->mTextureCoords[0][i].x;
-            vertex.st.t = pMesh->mTextureCoords[0][i].y;
+            if (pMesh->HasTextureCoords(0)) {
+                vertex.st.s = pMesh->mTextureCoords[0][i].x;
+                vertex.st.t = pMesh->mTextureCoords[0][i].y;
+            }
             // extract vertex colors (if present)
-            if (pMesh->mColors[0] != nullptr) {
+            if (pMesh->HasVertexColors(0)) {
                 vertex.col.r = pMesh->mColors[0][i].r;
                 vertex.col.g = pMesh->mColors[0][i].g;
                 vertex.col.b = pMesh->mColors[0][i].b;
