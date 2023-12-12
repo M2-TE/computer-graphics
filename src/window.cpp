@@ -40,9 +40,18 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
     // error logging (currently enabled in release mode as well)
     glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue, { "glGetError" });
     glbinding::setAfterCallback([](const glbinding::FunctionCall& call) {
+        static unsigned int callCount = 0;
+        static constexpr unsigned int maxCalls = 10;
+
         const auto errorCode = glGetError();
         if (errorCode != GL_NO_ERROR)
         {
+            // only allow a certain number of errors to be printed
+            if (++callCount >= maxCalls) {
+                if (callCount == maxCalls) std::cerr << "Too many OpenGL errors" << std::endl;
+                return;
+            }
+
             // print out the function name, parameters and return value
             std::cout << call.function->name() << '(';
             for (unsigned i = 0; i < call.parameters.size(); ++i) {
