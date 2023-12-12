@@ -12,13 +12,15 @@ include(GLbindingSettings)
 include(MiscSettings)
 
 include(FetchContent)
+set(FETCHCONTENT_QUIET OFF) # enable git output for FetchContent steps
 FetchContent_Declare(sdl3 GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git" GIT_TAG "main")
 FetchContent_Declare(assimp GIT_REPOSITORY "https://github.com/assimp/assimp.git" GIT_TAG "master")
 FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_TAG "master")
 FetchContent_Declare(stb GIT_REPOSITORY "https://github.com/M2-TE/stb_image.git" GIT_TAG "master")
 FetchContent_Declare(cmrc GIT_REPOSITORY "https://github.com/vector-of-bool/cmrc.git" GIT_TAG "master")
 FetchContent_Declare(glbinding GIT_REPOSITORY "https://github.com/cginternals/glbinding.git" GIT_TAG "master")
-FetchContent_MakeAvailable(sdl3 assimp glm stb cmrc glbinding)
+FetchContent_Declare(sponza GIT_REPOSITORY "https://github.com/jimmiebergmann/Sponza.git" GIT_TAG "master" SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/models/sponza")
+FetchContent_MakeAvailable(sdl3 assimp glm stb cmrc glbinding sponza)
 find_package(OpenGL REQUIRED COMPONENTS)
 
 file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*")
