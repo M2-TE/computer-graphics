@@ -58,15 +58,28 @@ void main() {
     vec3 projCoords = shadowCoord.xyz / shadowCoord.w;
     // convert from range [-1, 1] to [0, 1]
     projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(shadowMap, projCoords.xy).r; // depth as seen from light
     float currentDepth = projCoords.z; // theoretical depth of current fragment
     // calculate shadow
     // if the theoretical depth is larger than the depth as seen from the light, its in shadow
     float minBias = 0.005;
     float maxBias = 0.05;
     float bias = max(maxBias * (1.0 - dot(normal, lightDir)), minBias); // higher bias on higher viewing angles
-    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
-    if (projCoords.z > 1.0) shadow = 0.0; // simply disable shadow outside of light frustum
+    // float closestDepth = texture(shadowMap, projCoords.xy).r; // depth as seen from light
+    // float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+
+    // percentage closer filter (PCF)
+    float shadow = 0.0;
+    float shadowMapSize = 1024.0;
+    float texelSize = 1.0 / shadowMapSize;
+    // sample a 3x3 area of pixels
+    for (int x = -1; x <= 1; ++x) {
+        for (int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 0.0 : 1.0;
+        }
+    }
+    // get average shadow value
+    shadow /= 9.0;
 
 
     // final color (blend/interpolate vertex color with texture color)
