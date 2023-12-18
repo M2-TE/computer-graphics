@@ -18,6 +18,25 @@ using namespace gl;
 #include "game_objects/camera.hpp"
 
 struct App {
+    App() {
+        // create shadow map texture
+        GLuint& depthMap = shadowPipeline.framebufferTexture;
+        glCreateTextures(GL_TEXTURE_2D, 1, &depthMap);
+        glTextureStorage2D(depthMap, 1, GL_DEPTH_COMPONENT32F, shadowWidth, shadowHeight);
+        // set wrapping/magnification behavior
+        glTextureParameteri(depthMap, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(depthMap, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameteri(depthMap, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(depthMap, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        // create frame buffer for shadow mapping pipeline
+        glCreateFramebuffers(1, &shadowPipeline.framebuffer);
+        // attach texture to frame buffer (only draw to depth, no color output!)
+        glNamedFramebufferTexture(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, depthMap, 0);
+        glNamedFramebufferReadBuffer(shadowPipeline.framebuffer, GL_NONE);
+        glNamedFramebufferDrawBuffer(shadowPipeline.framebuffer, GL_NONE);
+    }
+
     int run() {
         while(bRunning) {
             input.flush(); // flush input from last frame
@@ -30,18 +49,33 @@ struct App {
                 window.handle_event(event); // handle window resize and such events
                 input.handle_event(event); // handle keyboard/mouse events
             }
-
             handle_inputs();
 
-            // clear screen (color and depth), bind render pipeline and draw mesh to it
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            pipeline.bind();
-            camera.bind();
+            // first pass: render shadow map
+            glViewport(0, 0, shadowWidth, shadowHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, shadowPipeline.framebuffer);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            shadowPipeline.bind();
+            // bind resources to pipeline
+            lightCamera.bind();
             light.bind();
-            
-            // now draw all the models
+            // draw models
             light.draw();
-            model.draw(camera.position);
+            model.draw();
+
+            // second pass: render color map
+            glViewport(0, 0, window.width, window.height);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            colorPipeline.bind();
+            // bind resources to pipeline
+            camera.bind();
+            lightCamera.bind_secondary();
+            glBindTextureUnit(1, shadowPipeline.framebufferTexture);
+            light.bind();
+            // draw models
+            light.draw();
+            model.draw();
             
             // present drawn frame to the screen
             window.swap();
@@ -78,10 +112,15 @@ private:
 private:
     Input input;
     Timer timer;
-    Window window = Window(1280, 720, 4);
-    Pipeline pipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
+    Window window = Window(1280, 720, 1);
+    Pipeline colorPipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
+    Pipeline shadowPipeline = Pipeline("shaders/shadowmapping.vs", "shaders/shadowmapping.fs");
     Camera camera = Camera({1, 1, 1}, {0, 0, 0}, window.width, window.height);
+    Camera lightCamera = Camera({0, 1, 0}, {0, 0, 0});
     Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");
     Light light = Light({0, 1, 0}, {0, 0, 0}, {1, 1, 1});
     bool bRunning = true;
+    // temporary:
+    int shadowWidth = 512;
+    int shadowHeight = 512;
 };

@@ -86,7 +86,7 @@ struct Model {
         }
 
     }
-    void draw(glm::vec3& cameraPosition) {
+    void draw() {
         transform.bind();
         for (int i = 0; i < meshes.size(); i++) {
             Material& material = materials[meshes[i].materialIndex];
@@ -150,9 +150,11 @@ private:
         glTextureStorage2D(texture, 1, GL_RGBA8, width, height);
         glTextureSubImage2D(texture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pImage);
 
-        // set wrapping parameters
+        // set wrapping/magnification behavior
         glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // mip-maps
         glGenerateTextureMipmap(texture);

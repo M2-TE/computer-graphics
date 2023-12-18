@@ -5,13 +5,16 @@
 #include <glm/gtc/type_ptr.hpp> // allows use of glm::value_ptr to get raw pointer to data
 
 struct Camera {
+    // constructor for perspective camera
     Camera(glm::vec3 position, glm::vec3 rotation, float width, float height)
     : position(position), rotation(rotation) {
-        build_projection(width, height);
-    }
-    
-    void build_projection(float width, float height) {
+        float fov = 70;
         projectionMatrix = glm::perspectiveFov(fov, width, height, nearPlane, farPlane);
+    }
+    // constructor for orthographic camera
+    Camera(glm::vec3 position, glm::vec3 rotation)
+    : position(position), rotation(rotation) {
+        projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
     }
 
     // translate relative to camera direction
@@ -21,10 +24,6 @@ struct Camera {
 
     void bind() {
         glm::mat4x4 viewMatrix(1.0f);
-        
-        // different order: first translate, then rotate!
-        // order of rotation matters here (first y, then x)
-        // final order of operations is reversed because of column-major matrices
         viewMatrix = glm::rotate(viewMatrix, -rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
         viewMatrix = glm::rotate(viewMatrix, -rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
         viewMatrix = glm::translate(viewMatrix, -position);
@@ -33,11 +32,20 @@ struct Camera {
         glUniformMatrix4fv(8, 1, false, glm::value_ptr(projectionMatrix));
         glUniform3f(16, position.x, position.y, position.z);
     }
+    void bind_secondary() {
+        glm::mat4x4 viewMatrix(1.0f);
+        viewMatrix = glm::rotate(viewMatrix, -rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        viewMatrix = glm::rotate(viewMatrix, -rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+        viewMatrix = glm::translate(viewMatrix, -position);
+
+        glUniformMatrix4fv(26, 1, false, glm::value_ptr(viewMatrix));
+        glUniformMatrix4fv(30, 1, false, glm::value_ptr(projectionMatrix));
+        glUniform3f(34, position.x, position.y, position.z);
+    }
 
     glm::mat4x4 projectionMatrix;
-    glm::vec3 position = glm::vec3(0.0f, 100.0f, 5.0f);
-    glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f); // euler rotation
+    glm::vec3 position;
+    glm::vec3 rotation; // euler rotation
     float nearPlane = 0.1f;
     float farPlane = 100.0f;
-    float fov = 70;
 };

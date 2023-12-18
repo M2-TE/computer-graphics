@@ -49,6 +49,8 @@ struct Pipeline {
         glUseProgram(shaderProgram);
     }
 
+    GLuint framebuffer;
+    GLuint framebufferTexture;
 private:
     GLuint shaderProgram;
 };

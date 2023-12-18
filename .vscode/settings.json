@@ -6,13 +6,13 @@
     },
     "files.associations": {
         "*.cppm": "cpp",
+        "*.tcc": "cpp",
         "*.cu": "cuda-cpp",
         "*.fs": "glsl",
         "*.vs": "glsl",
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
-        "*.tcc": "cpp",
         "cctype": "cpp",
         "charconv": "cpp",
         "chrono": "cpp",
@@ -93,7 +93,8 @@
         "codecvt": "cpp",
         "complex": "cpp",
         "source_location": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "*.isph": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

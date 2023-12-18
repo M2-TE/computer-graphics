@@ -12,7 +12,6 @@ layout (location = 16) uniform vec3 cameraWorldPos;
 layout (location = 17) uniform vec3 lightWorldPos;
 layout (location = 18) uniform vec3 lightColor;
 
-// define custom struct
 struct Material {
     vec3 ambient; // first slot
     vec3 diffuse; // second slot
@@ -21,10 +20,14 @@ struct Material {
     float shininessStrength;
     float diffuseBlend;
 };
-
-// Material needs multiple slots
 layout (location = 20) uniform Material material;
+layout (location = 26) uniform mat4 lightViewMatrix;
+layout (location = 30) uniform mat4 lightPerspectiveMatrix;
+layout (location = 34) uniform vec3 lightCameraWorldPos;
+
+// texture samplers
 layout (binding = 0) uniform sampler2D diffuseTexture;
+layout (binding = 1) uniform sampler2D shadowMap;
 
 void main() {
     // create our "sun"
@@ -46,11 +49,26 @@ void main() {
     specularStrength *= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
     vec3 specularColor = lightColor * specularStrength * material.specular;
 
+    // shadow color
+    // calculate shadow coord for current fragment (could do this in vertex shader)
+    vec4 shadowCoord = lightPerspectiveMatrix * lightViewMatrix * vec4(worldPos, 1.0);
+    // perspective divide (depth is stored in shadowCoord.w)
+    // orthographic projection would not need this
+    // this is done automatically for gl_Position in vertex shader
+    vec3 projCoords = shadowCoord.xyz / shadowCoord.w;
+    // convert from range [-1, 1] to [0, 1]
+    projCoords = projCoords * 0.5 + 0.5;
+    float closestDepth = texture(shadowMap, projCoords.xy).r; // depth as seen from light
+    float currentDepth = projCoords.z; // theoretical depth of current fragment
+    // calculate shadow
+    // if the theoretical depth is larger than the depth as seen from the light, its in shadow
+    float shadow = currentDepth > closestDepth ? 0.0 : 1.0;
+
     // final color (blend/interpolate vertex color with texture color)
     vec4 sampledColor = texture(diffuseTexture, uvCoord);
     vec4 color = mix(vertCol, sampledColor, material.diffuseBlend);
     // combine with light colors
-    color = vec4(color.rgb * (ambientColor + diffuseColor + specularColor), color.a);
+    color = vec4(color.rgb * (ambientColor + shadow * (diffuseColor + specularColor)), color.a);
 
     // write to screen
     pixelColor = color;
