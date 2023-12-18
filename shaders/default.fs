@@ -62,7 +62,12 @@ void main() {
     float currentDepth = projCoords.z; // theoretical depth of current fragment
     // calculate shadow
     // if the theoretical depth is larger than the depth as seen from the light, its in shadow
-    float shadow = currentDepth > closestDepth ? 0.0 : 1.0;
+    float minBias = 0.005;
+    float maxBias = 0.05;
+    float bias = max(maxBias * (1.0 - dot(normal, lightDir)), minBias); // higher bias on higher viewing angles
+    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+    if (projCoords.z > 1.0) shadow = 0.0; // simply disable shadow outside of light frustum
+
 
     // final color (blend/interpolate vertex color with texture color)
     vec4 sampledColor = texture(diffuseTexture, uvCoord);
