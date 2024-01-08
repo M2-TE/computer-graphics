@@ -19,10 +19,11 @@ layout (location = 20) uniform Material material;
 layout (location = 26) uniform mat4 lightViewMatrix;
 layout (location = 30) uniform mat4 lightPerspectiveMatrix;
 layout (location = 34) uniform vec3 lightCameraWorldPos;
+layout (location = 35) uniform float lightFar;
 
 void main() {
     // do not write any color output
     float lightDistance = length(worldPos - lightWorldPos);
-    lightDistance = lightDistance / 100.0;
+    lightDistance = lightDistance / lightFar;
     gl_FragDepth = lightDistance;
 }

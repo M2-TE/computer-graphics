@@ -24,14 +24,12 @@ layout (location = 20) uniform Material material;
 layout (location = 26) uniform mat4 lightViewMatrix;
 layout (location = 30) uniform mat4 lightPerspectiveMatrix;
 layout (location = 34) uniform vec3 lightCameraWorldPos;
+layout (location = 35) uniform float lightFar;
 
 // texture samplers
 layout (binding = 0) uniform sampler2D diffuseTexture;
 layout (binding = 1) uniform samplerCube shadowMap;
 
-float linearize_depth(float depth, float near, float far) {
-    return 2.0 * near * far / (far + near - depth * (far - near));
-}
 void main() {
     // create our "sun"
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
@@ -55,11 +53,27 @@ void main() {
     // shadow color
     vec3 fragToLight = worldPos - lightWorldPos;
     float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
-    // closestDepth = linearize_depth(closestDepth, 0.1, 100.0);
-    closestDepth *= 100.0;
+    closestDepth *= lightFar;
     float currentDepth = length(fragToLight);
-    float shadow = currentDepth - 0.05 > closestDepth ? 0.0 : 1.0;
-    // shadow = 1.0;
+    float bias = 0.1;
+    float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
+    
+    // percentage closer filter
+    float samples = 4.0;
+    float offset  = 0.1;
+    for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+    {
+        for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+        {
+            for(float z = -offset; z < offset; z += offset / (samples * 0.5))
+            {
+                float closestDepth = texture(shadowMap, fragToLight + vec3(x, y, z)).r; 
+                closestDepth *= lightFar;   // undo mapping [0;1]
+                if(currentDepth - bias < closestDepth) shadow += 1.0;
+            }
+        }
+    }
+    shadow /= (samples * samples * samples);
 
     // final color (blend/interpolate vertex color with texture color)
     vec4 sampledColor = texture(diffuseTexture, uvCoord);

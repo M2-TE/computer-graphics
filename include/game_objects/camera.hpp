@@ -8,7 +8,7 @@ struct Camera {
     // constructor for perspective camera
     Camera(glm::vec3 position, glm::vec3 rotation, float width, float height)
     : position(position), rotation(glm::radians(rotation)) {
-        float fov = 70;
+        float fov = glm::radians(70.0f);
         projectionMatrix = glm::perspectiveFov(fov, width, height, nearPlane, farPlane);
     }
     // constructor for orthographic camera

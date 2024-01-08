@@ -37,7 +37,7 @@ struct App {
         glNamedFramebufferDrawBuffer(shadowPipeline.framebuffer, GL_NONE);
         
         // prepare shadow cameras
-        shadowProjection = glm::perspectiveFov(glm::radians(90.0f), (float)shadowWidth, (float)shadowHeight, 1.0f, 100.0f);
+        shadowProjection = glm::perspectiveFov(glm::radians(90.0f), (float)shadowWidth, (float)shadowHeight, 1.0f, lightFar);
         shadowViews[0] = glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)); // right
         shadowViews[1] = glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)); // left
         shadowViews[2] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // top
@@ -72,6 +72,7 @@ struct App {
                 glUniformMatrix4fv(4, 1, false, glm::value_ptr(shadowViews[face]));
                 glUniformMatrix4fv(8, 1, false, glm::value_ptr(shadowProjection));
                 glUniform3f(17, lightPos.x, lightPos.y, lightPos.z);
+                glUniform1f(35, lightFar);
                 // draw models
                 light.draw();
                 model.draw();
@@ -84,6 +85,7 @@ struct App {
             colorPipeline.bind();
             // bind resources to pipeline
             glUniform3f(17, lightPos.x, lightPos.y, lightPos.z);
+            glUniform1f(35, lightFar);
             glBindTextureUnit(1, shadowPipeline.framebufferTexture);
             camera.bind();
             light.bind();
@@ -137,6 +139,7 @@ private:
     // temporary:
     int shadowWidth = 512;
     int shadowHeight = 512;
+    float lightFar = 20.0f;
     GLuint shadowCubemap;
     std::array<glm::mat4x4, 6> shadowViews;
     glm::mat4x4 shadowProjection;
