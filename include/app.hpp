@@ -112,11 +112,11 @@ private:
 private:
     Input input;
     Timer timer;
-    Window window = Window(1280, 720, 1);
+    Window window = Window(1280, 720, 4);
     Pipeline colorPipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Pipeline shadowPipeline = Pipeline("shaders/shadowmapping.vs", "shaders/shadowmapping.fs");
     Camera camera = Camera({1, 1, 1}, {0, 0, 0}, window.width, window.height);
-    Camera lightCamera = Camera({0, 1, 0}, {-.2, 0, 0});
+    Camera lightCamera = Camera({0, 1, 0}, {0, 0, 0});
     Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");
     Light light = Light({0, 1, 0}, {0, 0, 0}, {1, 1, 1});
     bool bRunning = true;

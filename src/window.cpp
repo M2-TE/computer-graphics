@@ -28,7 +28,7 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
 
     // create OpenGL window
     // SDL_GL_MULTISAMPLEBUFFERS
-    pWindow = SDL_CreateWindow("OpenGL Renderer", width, height, SDL_WindowFlags::SDL_WINDOW_OPENGL);
+    pWindow = SDL_CreateWindow("OpenGL Renderer", width, height, SDL_WINDOW_OPENGL);
     if (pWindow == nullptr) std::cout << SDL_GetError();
 
     // create opengl context
