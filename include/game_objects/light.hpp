@@ -20,7 +20,6 @@ struct Light {
         mesh.draw();
     }
 
-    // glm::vec3 lightColor = glm::vec3(.992f, .984f, .827f);
     glm::vec3 lightColor = glm::vec3(.992f, .984f, .827f);
     Transform transform;
     Material material;

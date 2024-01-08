@@ -27,8 +27,11 @@ layout (location = 34) uniform vec3 lightCameraWorldPos;
 
 // texture samplers
 layout (binding = 0) uniform sampler2D diffuseTexture;
-layout (binding = 1) uniform sampler2D shadowMap;
+layout (binding = 1) uniform samplerCube shadowMap;
 
+float linearize_depth(float depth, float near, float far) {
+    return 2.0 * near * far / (far + near - depth * (far - near));
+}
 void main() {
     // create our "sun"
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
@@ -50,37 +53,13 @@ void main() {
     vec3 specularColor = lightColor * specularStrength * material.specular;
 
     // shadow color
-    // calculate shadow coord for current fragment (could do this in vertex shader)
-    vec4 shadowCoord = lightPerspectiveMatrix * lightViewMatrix * vec4(worldPos, 1.0);
-    // perspective divide (depth is stored in shadowCoord.w)
-    // orthographic projection would not need this
-    // this is done automatically for gl_Position in vertex shader
-    vec3 projCoords = shadowCoord.xyz / shadowCoord.w;
-    // convert from range [-1, 1] to [0, 1]
-    projCoords = projCoords * 0.5 + 0.5;
-    float currentDepth = projCoords.z; // theoretical depth of current fragment
-    // calculate shadow
-    // if the theoretical depth is larger than the depth as seen from the light, its in shadow
-    float minBias = 0.005;
-    float maxBias = 0.05;
-    float bias = max(maxBias * (1.0 - dot(normal, lightDir)), minBias); // higher bias on higher viewing angles
-    // float closestDepth = texture(shadowMap, projCoords.xy).r; // depth as seen from light
-    // float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
-
-    // percentage closer filter (PCF)
-    float shadow = 0.0;
-    float shadowMapSize = 1024.0;
-    float texelSize = 1.0 / shadowMapSize;
-    // sample a 3x3 area of pixels
-    for (int x = -1; x <= 1; ++x) {
-        for (int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 0.0 : 1.0;
-        }
-    }
-    // get average shadow value
-    shadow /= 9.0;
-
+    vec3 fragToLight = worldPos - lightWorldPos;
+    float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
+    // closestDepth = linearize_depth(closestDepth, 0.1, 100.0);
+    closestDepth *= 100.0;
+    float currentDepth = length(fragToLight);
+    float shadow = currentDepth - 0.05 > closestDepth ? 0.0 : 1.0;
+    // shadow = 1.0;
 
     // final color (blend/interpolate vertex color with texture color)
     vec4 sampledColor = texture(diffuseTexture, uvCoord);
@@ -90,4 +69,5 @@ void main() {
 
     // write to screen
     pixelColor = color;
+    // pixelColor = vec4(vec3(closestDepth / 50.0), 1.0);
 }

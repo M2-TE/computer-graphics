@@ -19,22 +19,31 @@ using namespace gl;
 
 struct App {
     App() {
-        // create shadow map texture
+        // create shadow cubemap
         GLuint& depthMap = shadowPipeline.framebufferTexture;
-        glCreateTextures(GL_TEXTURE_2D, 1, &depthMap);
+        glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &depthMap);
         glTextureStorage2D(depthMap, 1, GL_DEPTH_COMPONENT32F, shadowWidth, shadowHeight);
         // set wrapping/magnification behavior
         glTextureParameteri(depthMap, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(depthMap, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameteri(depthMap, GL_TEXTURE_WRAP_R, GL_REPEAT);
         glTextureParameteri(depthMap, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTextureParameteri(depthMap, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // create frame buffer for shadow mapping pipeline
         glCreateFramebuffers(1, &shadowPipeline.framebuffer);
         // attach texture to frame buffer (only draw to depth, no color output!)
-        glNamedFramebufferTexture(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, depthMap, 0);
         glNamedFramebufferReadBuffer(shadowPipeline.framebuffer, GL_NONE);
         glNamedFramebufferDrawBuffer(shadowPipeline.framebuffer, GL_NONE);
+        
+        // prepare shadow cameras
+        shadowProjection = glm::perspectiveFov(glm::radians(90.0f), (float)shadowWidth, (float)shadowHeight, 1.0f, 100.0f);
+        shadowViews[0] = glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)); // right
+        shadowViews[1] = glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)); // left
+        shadowViews[2] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // top
+        shadowViews[3] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)); // bottom
+        shadowViews[4] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)); // back
+        shadowViews[5] = glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)); // front
     }
 
     int run() {
@@ -54,14 +63,19 @@ struct App {
             // first pass: render shadow map
             glViewport(0, 0, shadowWidth, shadowHeight);
             glBindFramebuffer(GL_FRAMEBUFFER, shadowPipeline.framebuffer);
-            glClear(GL_DEPTH_BUFFER_BIT);
             shadowPipeline.bind();
-            // bind resources to pipeline
-            lightCamera.bind();
-            light.bind();
-            // draw models
-            light.draw();
-            model.draw();
+            // render each cubemap face (omnidirectional shadows)
+            for (int face = 0; face < 6; face++) {
+                glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, shadowPipeline.framebufferTexture, 0, face);
+                glClear(GL_DEPTH_BUFFER_BIT);
+                // bind resources to pipeline
+                glUniformMatrix4fv(4, 1, false, glm::value_ptr(shadowViews[face]));
+                glUniformMatrix4fv(8, 1, false, glm::value_ptr(shadowProjection));
+                glUniform3f(17, lightPos.x, lightPos.y, lightPos.z);
+                // draw models
+                light.draw();
+                model.draw();
+            }
 
             // second pass: render color map
             glViewport(0, 0, window.width, window.height);
@@ -69,9 +83,9 @@ struct App {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             colorPipeline.bind();
             // bind resources to pipeline
-            camera.bind();
-            lightCamera.bind_secondary();
+            glUniform3f(17, lightPos.x, lightPos.y, lightPos.z);
             glBindTextureUnit(1, shadowPipeline.framebufferTexture);
+            camera.bind();
             light.bind();
             // draw models
             light.draw();
@@ -115,12 +129,15 @@ private:
     Window window = Window(1280, 720, 4);
     Pipeline colorPipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Pipeline shadowPipeline = Pipeline("shaders/shadowmapping.vs", "shaders/shadowmapping.fs");
-    Camera camera = Camera({1, 1, 1}, {0, 0, 0}, window.width, window.height);
-    Camera lightCamera = Camera({0, 1, 0}, {0, 0, 0});
+    glm::vec3 lightPos = {1, 1, 0};
+    Camera camera = Camera(lightPos, {0, 0, 0}, window.width, window.height);
     Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");
-    Light light = Light({0, 1, 0}, {0, 0, 0}, {1, 1, 1});
+    Light light = Light(lightPos, {0, 0, 0}, {1, 1, 1});
     bool bRunning = true;
     // temporary:
     int shadowWidth = 512;
     int shadowHeight = 512;
+    GLuint shadowCubemap;
+    std::array<glm::mat4x4, 6> shadowViews;
+    glm::mat4x4 shadowProjection;
 };

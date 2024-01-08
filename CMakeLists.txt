@@ -31,7 +31,7 @@ cmrc_add_resource_library(images "${image-files}") # embed images into library "
 # create executable target
 file(GLOB_RECURSE source-files CONFIGURE_DEPENDS "src/*")
 add_executable(${PROJECT_NAME} "${source-files}")
-target_include_directories(${PROJECT_NAME} PRIVATE "include/")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 # link libraries to executable
 target_link_libraries(${PROJECT_NAME} glm) # OpenGL math library
