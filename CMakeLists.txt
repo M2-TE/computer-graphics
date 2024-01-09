@@ -34,7 +34,7 @@ add_executable(${PROJECT_NAME} "${source-files}")
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 # link libraries to executable
-target_link_libraries(${PROJECT_NAME} glm) # OpenGL math library
+target_link_libraries(${PROJECT_NAME} glm::glm-header-only) # OpenGL math library
 target_link_libraries(${PROJECT_NAME} SDL3::SDL3)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL) # OpenGL headers
 target_link_libraries(${PROJECT_NAME} glbinding::glbinding) # OpenGL function loader

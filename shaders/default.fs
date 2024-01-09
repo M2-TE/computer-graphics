@@ -55,7 +55,7 @@ void main() {
     float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
     closestDepth *= lightFar;
     float currentDepth = length(fragToLight);
-    float bias = 0.1;
+    float bias = max(0.5 * (1.0 - dot(normal, lightDir)), 0.005);  
     float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
     
     // percentage closer filter
