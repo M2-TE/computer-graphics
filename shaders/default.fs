@@ -52,9 +52,9 @@ float calc_shadow() {
     vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
     vec3 fragToLight = worldPos - lightWorldPos;
     float bias = max(0.5 * (1.0 - dot(normal, lightDir)), 0.005);  
+    float currentDepth = length(fragToLight);
     // float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
     // closestDepth *= lightFar;
-    // float currentDepth = length(fragToLight);
     // float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
     
     // percentage closer filter

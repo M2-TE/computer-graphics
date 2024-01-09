@@ -9,10 +9,11 @@ struct Light {
     }
 
     // bind light properties
-    void bind() {
+    virtual void bind() {
         glUniform3f(17, transform.position.x, transform.position.y, transform.position.z);
         glUniform3f(18, lightColor.x, lightColor.y, lightColor.z);
     }
+    
     // draw the object that represents the light
     void draw() {
         transform.bind();
