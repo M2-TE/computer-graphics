@@ -25,18 +25,16 @@ struct PointLight : public Light {
     void adjust_viewport() {
         glViewport(0, 0, shadowWidth, shadowHeight);
     }
-    // bind for writing (shadowcasting)
-    void bind(int face) {
+    void bind_write(int face) {
         Light::bind();
         glUniformMatrix4fv(4, 1, false, glm::value_ptr(shadowViews[face]));
         glUniformMatrix4fv(8, 1, false, glm::value_ptr(shadowProjection));
         glUniform1f(35, radius);
     }
-    // bind for reading
-    void bind() override {
+    void bind_read(int texIndex) {
         Light::bind();
         glUniform1f(35, radius);
-        glBindTextureUnit(1, shadowCubemap);
+        glBindTextureUnit(texIndex, shadowCubemap);
     }
 
     std::array<glm::mat4x4, 6> shadowViews;

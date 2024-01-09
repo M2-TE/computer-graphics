@@ -49,7 +49,7 @@ struct App {
                 glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, light.shadowCubemap, 0, face);
                 glClear(GL_DEPTH_BUFFER_BIT);
                 // bind resources to pipeline
-                light.bind(face);
+                light.bind_write(face);
                 // draw models
                 light.draw();
                 model.draw();
@@ -62,7 +62,7 @@ struct App {
             colorPipeline.bind();
             // bind resources to pipeline
             camera.bind();
-            light.bind();
+            light.bind_read(1);
             // draw models
             light.draw();
             model.draw();
