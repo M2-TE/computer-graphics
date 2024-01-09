@@ -29,11 +29,11 @@ struct PointLight : public Light {
         Light::bind();
         glUniformMatrix4fv(4, 1, false, glm::value_ptr(shadowViews[face]));
         glUniformMatrix4fv(8, 1, false, glm::value_ptr(shadowProjection));
-        glUniform1f(35, radius);
+        glUniform1f(25, radius);
     }
     void bind_read(int texIndex) {
         Light::bind();
-        glUniform1f(35, radius);
+        glUniform1f(25, radius);
         glBindTextureUnit(texIndex, shadowCubemap);
     }
 

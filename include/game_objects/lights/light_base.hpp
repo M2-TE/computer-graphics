@@ -10,8 +10,8 @@ struct Light {
 
     // bind light properties
     void bind() {
-        glUniform3f(17, transform.position.x, transform.position.y, transform.position.z);
-        glUniform3f(18, lightColor.x, lightColor.y, lightColor.z);
+        glUniform3f(23, transform.position.x, transform.position.y, transform.position.z);
+        glUniform3f(24, lightColor.x, lightColor.y, lightColor.z);
     }
     
     // draw the object that represents the light

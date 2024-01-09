@@ -8,23 +8,26 @@ layout (location = 3) in vec4 vertCol;
 // output
 layout (location = 0) out vec4 pixelColor;
 
-layout (location = 16) uniform vec3 cameraWorldPos;
-layout (location = 17) uniform vec3 lightWorldPos;
-layout (location = 18) uniform vec3 lightColor;
-
+struct Camera {
+    vec3 worldPos; // 16
+};
 struct Material {
-    vec3 ambient; // first slot
-    vec3 diffuse; // second slot
-    vec3 specular; // third slot
-    float shininess; // etc
+    vec3 ambient; // 17
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
     float shininessStrength;
     float diffuseBlend;
 };
-layout (location = 20) uniform Material material;
-layout (location = 26) uniform mat4 lightViewMatrix;
-layout (location = 30) uniform mat4 lightPerspectiveMatrix;
-layout (location = 34) uniform vec3 lightCameraWorldPos;
-layout (location = 35) uniform float lightFar;
+struct Light {
+    vec3 worldPos; // 23
+    vec3 color;
+    float radius;
+};
+// uniform constants
+layout (location = 16) uniform Camera camera;
+layout (location = 17) uniform Material material;
+layout (location = 23) uniform Light light;
 
 // texture samplers
 layout (binding = 0) uniform sampler2D diffuseTexture;
@@ -32,30 +35,27 @@ layout (binding = 1) uniform samplerCube shadowMap;
 
 vec3 calc_ambient() {
     float ambientStrength = 1.0; // ambient modifier
-    return lightColor * ambientStrength * material.ambient;
+    return light.color * ambientStrength * material.ambient;
 }
 vec3 calc_diffuse() {
-    vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
+    vec3 lightDir = normalize(light.worldPos - worldPos); // unit vector from light to fragment
     float diffuseStrength = dot(normal, lightDir); // calc intensity of light
     diffuseStrength = max(diffuseStrength, 0.0); // filter out negative intensity
-    return lightColor * diffuseStrength * material.diffuse;
+    return light.color * diffuseStrength * material.diffuse;
 }
 vec3 calc_specular() {
-    vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
-    vec3 cameraDir = normalize(cameraWorldPos - worldPos); // unit vector from camera to fragment
+    vec3 lightDir = normalize(light.worldPos - worldPos); // unit vector from light to fragment
+    vec3 cameraDir = normalize(camera.worldPos - worldPos); // unit vector from camera to fragment
     vec3 reflectDir = reflect(-lightDir, normal);
     float specularStrength = material.shininessStrength; // specular modifier
     specularStrength *= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
-    return lightColor * specularStrength * material.specular;
+    return light.color * specularStrength * material.specular;
 }
 float calc_shadow() {
-    vec3 lightDir = normalize(lightWorldPos - worldPos); // unit vector from light to fragment
-    vec3 fragToLight = worldPos - lightWorldPos;
+    vec3 lightDir = normalize(light.worldPos - worldPos); // unit vector from light to fragment
+    vec3 fragToLight = worldPos - light.worldPos;
     float bias = max(0.5 * (1.0 - dot(normal, lightDir)), 0.005);  
     float currentDepth = length(fragToLight);
-    // float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
-    // closestDepth *= lightFar;
-    // float shadow = currentDepth - bias > closestDepth ? 0.0 : 1.0;
     
     // percentage closer filter
     float samples = 4.0;
@@ -65,7 +65,7 @@ float calc_shadow() {
         for(float y = -offset; y < offset; y += offset / (samples * 0.5)) {
             for(float z = -offset; z < offset; z += offset / (samples * 0.5)) {
                 float closestDepth = texture(shadowMap, fragToLight + vec3(x, y, z)).r; 
-                closestDepth *= lightFar;
+                closestDepth *= light.radius;
                 if(currentDepth - bias < closestDepth) shadow += 1.0;
             }
         }
@@ -85,8 +85,14 @@ vec4 calc_light() {
     // blend sampled color with light
     return vec4(color.rgb * (ambientColor + shadow * (diffuseColor + specularColor)), color.a);
 }
+vec4 calc_debug() {
+    vec3 fragToLight = worldPos - light.worldPos;
+    float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
+    closestDepth *= light.radius;
+    return vec4(vec3(closestDepth / light.radius), 1.0);
+}
 
 void main() {
     pixelColor = calc_light();
-    // pixelColor = vec4(vec3(closestDepth / 50.0), 1.0);
+    // pixelColor = calc_debug();
 }

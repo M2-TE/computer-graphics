@@ -3,7 +3,7 @@
 struct Material {
     void bind() {
         // bind each component to its location
-        GLuint startLocation = 20;
+        GLuint startLocation = 17;
         glUniform3f(startLocation++, ambient.r, ambient.g, ambient.b);
         glUniform3f(startLocation++, diffuse.r, diffuse.g, diffuse.b);
         glUniform3f(startLocation++, specular.r, specular.g, specular.b);
