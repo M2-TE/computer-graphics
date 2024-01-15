@@ -19,8 +19,9 @@ FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_
 FetchContent_Declare(stb GIT_REPOSITORY "https://github.com/M2-TE/stb_image.git" GIT_TAG "master")
 FetchContent_Declare(cmrc GIT_REPOSITORY "https://github.com/vector-of-bool/cmrc.git" GIT_TAG "master")
 FetchContent_Declare(glbinding GIT_REPOSITORY "https://github.com/cginternals/glbinding.git" GIT_TAG "master")
+FetchContent_Declare(imgui GIT_REPOSITORY "https://github.com/ocornut/imgui.git" GIT_TAG "docking")
 FetchContent_Declare(sponza GIT_REPOSITORY "https://github.com/jimmiebergmann/Sponza.git" GIT_TAG "master" SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/models/sponza")
-FetchContent_MakeAvailable(sdl3 assimp glm stb cmrc glbinding sponza)
+FetchContent_MakeAvailable(sdl3 assimp glm stb cmrc glbinding imgui sponza)
 set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Faster config after FetchContent has run once" FORCE)
 find_package(OpenGL REQUIRED COMPONENTS)
 
@@ -32,7 +33,15 @@ cmrc_add_resource_library(images "${image-files}") # embed images into library "
 # create executable target
 file(GLOB_RECURSE source-files CONFIGURE_DEPENDS "src/*")
 add_executable(${PROJECT_NAME} "${source-files}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+    "${imgui_SOURCE_DIR}/"
+    "${imgui_SOURCE_DIR}/backends")
+file(GLOB imgui-sources CONFIGURE_DEPENDS "${imgui_SOURCE_DIR}/*.cpp")
+target_sources(${PROJECT_NAME} PRIVATE
+    "${imgui-sources}"
+    "${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp"
+    "${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp")
 
 # link libraries to executable
 target_link_libraries(${PROJECT_NAME} glm::glm-header-only) # OpenGL math library

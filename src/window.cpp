@@ -3,6 +3,9 @@
 #include <glbinding/AbstractFunction.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_opengl3.h>
 #include <iostream>
 #include <cassert>
 #include "window.hpp"
@@ -90,8 +93,20 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
     // color blending via fragment shader's alpha value
     // glEnable(GL_BLEND); // color blending for proper transparency
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // define function for blending colors
+
+    // initialize ImGUI
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    ImGui_ImplSDL3_InitForOpenGL(pWindow, context);
+    ImGui_ImplOpenGL3_Init();
 }
 Window::~Window() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
     SDL_Quit();
 }
 
