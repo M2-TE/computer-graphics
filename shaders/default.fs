@@ -32,7 +32,7 @@ layout (location = 23) uniform Light lights[N_LIGHTS]; // 23, 26
 
 // texture samplers
 layout (binding = 0) uniform sampler2D diffuseTexture;
-layout (binding = 1) uniform samplerCube shadowMaps[N_LIGHTS];
+layout (binding = 1) uniform samplerCube shadowMaps[N_LIGHTS]; // binding 1, 2
 
  // indirect scattered light
 vec3 calc_ambient() {
