@@ -32,7 +32,7 @@ layout (location = 23) uniform Light lights[N_LIGHTS]; // 23, 26
 
 // texture samplers
 layout (binding = 0) uniform sampler2D diffuseTexture;
-layout (binding = 1) uniform samplerCube shadowMap;
+layout (binding = 1) uniform samplerCube shadowMaps[N_LIGHTS];
 
  // indirect scattered light
 vec3 calc_ambient() {
@@ -68,7 +68,7 @@ float calc_shadow(uint i) {
     for(float x = -offset; x < offset; x += offset / (samples * 0.5)) {
         for(float y = -offset; y < offset; y += offset / (samples * 0.5)) {
             for(float z = -offset; z < offset; z += offset / (samples * 0.5)) {
-                float closestDepth = texture(shadowMap, fragToLight + vec3(x, y, z)).r; 
+                float closestDepth = texture(shadowMaps[i], fragToLight + vec3(x, y, z)).r; 
                 closestDepth *= lights[i].radius;
                 if(currentDepth - bias < closestDepth) shadow += 1.0;
             }
@@ -96,7 +96,7 @@ vec4 calc_light() {
 }
 vec4 calc_debug() {
     vec3 fragToLight = worldPos - lights[0].worldPos;
-    float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
+    float closestDepth = texture(shadowMaps[0], fragToLight).r; // depth as seen from light
     closestDepth *= lights[0].radius;
     return vec4(vec3(closestDepth / lights[0].radius), 1.0);
 }

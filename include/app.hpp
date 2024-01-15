@@ -51,12 +51,12 @@ struct App {
                 // bind resources to pipeline
                 light.bind_write(face);
                 // draw models
-                light.draw();
+                lightB.draw();
                 model.draw();
             }
              for (int face = 0; face < 6; face++) {
                 // set framebuffer texture and clear it
-                glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, light.shadowCubemap, 0, face);
+                glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, lightB.shadowCubemap, 0, face);
                 glClear(GL_DEPTH_BUFFER_BIT);
                 // bind resources to pipeline
                 lightB.bind_write(face);
@@ -73,9 +73,10 @@ struct App {
             // bind resources to pipeline
             camera.bind();
             light.bind_read(0, 1);
-            // lightB.bind_read(1, 2);
+            lightB.bind_read(1, 2);
             // draw models
             light.draw();
+            lightB.draw();
             model.draw();
             
             // present drawn frame to the screen
