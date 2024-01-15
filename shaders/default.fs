@@ -19,7 +19,7 @@ struct Material {
     float shininessStrength;
     float diffuseBlend;
 };
-struct Light {
+struct Light { // assuming this is a point light
     vec3 worldPos; // 23
     vec3 color;
     float radius;
@@ -27,33 +27,37 @@ struct Light {
 // uniform constants
 layout (location = 16) uniform Camera camera;
 layout (location = 17) uniform Material material;
-layout (location = 23) uniform Light light;
+#define N_LIGHTS 2
+layout (location = 23) uniform Light lights[N_LIGHTS]; // 23, 26
 
 // texture samplers
 layout (binding = 0) uniform sampler2D diffuseTexture;
 layout (binding = 1) uniform samplerCube shadowMap;
 
+ // indirect scattered light
 vec3 calc_ambient() {
     float ambientStrength = 1.0; // ambient modifier
-    return light.color * ambientStrength * material.ambient;
+    return ambientStrength * material.ambient + material.diffuse * 0.1;
 }
-vec3 calc_diffuse() {
-    vec3 lightDir = normalize(light.worldPos - worldPos); // unit vector from light to fragment
+ // direct light
+vec3 calc_diffuse(uint i) {
+    vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
     float diffuseStrength = dot(normal, lightDir); // calc intensity of light
     diffuseStrength = max(diffuseStrength, 0.0); // filter out negative intensity
-    return light.color * diffuseStrength * material.diffuse;
+    return lights[i].color * diffuseStrength * material.diffuse;
 }
-vec3 calc_specular() {
-    vec3 lightDir = normalize(light.worldPos - worldPos); // unit vector from light to fragment
+ // direct light specular highlights
+vec3 calc_specular(uint i) {
+    vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
     vec3 cameraDir = normalize(camera.worldPos - worldPos); // unit vector from camera to fragment
     vec3 reflectDir = reflect(-lightDir, normal);
     float specularStrength = material.shininessStrength; // specular modifier
     specularStrength *= pow(max(dot(cameraDir, reflectDir), 0.0), material.shininess);
-    return light.color * specularStrength * material.specular;
+    return lights[i].color * specularStrength * material.specular;
 }
-float calc_shadow() {
-    vec3 lightDir = normalize(light.worldPos - worldPos); // unit vector from light to fragment
-    vec3 fragToLight = worldPos - light.worldPos;
+float calc_shadow(uint i) {
+    vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
+    vec3 fragToLight = worldPos - lights[i].worldPos;
     float bias = max(0.5 * (1.0 - dot(normal, lightDir)), 0.005);  
     float currentDepth = length(fragToLight);
     
@@ -65,7 +69,7 @@ float calc_shadow() {
         for(float y = -offset; y < offset; y += offset / (samples * 0.5)) {
             for(float z = -offset; z < offset; z += offset / (samples * 0.5)) {
                 float closestDepth = texture(shadowMap, fragToLight + vec3(x, y, z)).r; 
-                closestDepth *= light.radius;
+                closestDepth *= lights[i].radius;
                 if(currentDepth - bias < closestDepth) shadow += 1.0;
             }
         }
@@ -73,23 +77,28 @@ float calc_shadow() {
     return shadow / (samples * samples * samples);
 }
 vec4 calc_light() {
-    vec3 ambientColor = calc_ambient(); // indirect scattered light
-    vec3 diffuseColor = calc_diffuse(); // direct light
-    vec3 specularColor = calc_specular(); // specular highlights (from direct light)
-    float shadow = calc_shadow(); // shadow influence
+    // calculate lighting
+    vec3 ambientColor = calc_ambient();
+    vec3 specularColor = vec3(0.0, 0.0, 0.0);
+    vec3 diffuseColor = vec3(0.0, 0.0, 0.0);
+    for (uint i = 0; i < N_LIGHTS; i++) {
+        float shadow = calc_shadow(i);
+        diffuseColor += calc_diffuse(i) * shadow;
+        specularColor += calc_specular(i) * shadow;
+    }
 
     // blend texture/vertex colors
     vec4 sampledColor = texture(diffuseTexture, uvCoord);
     vec4 color = mix(vertCol, sampledColor, material.diffuseBlend);
 
     // blend sampled color with light
-    return vec4(color.rgb * (ambientColor + shadow * (diffuseColor + specularColor)), color.a);
+    return vec4(color.rgb * (ambientColor + diffuseColor + specularColor), color.a);
 }
 vec4 calc_debug() {
-    vec3 fragToLight = worldPos - light.worldPos;
+    vec3 fragToLight = worldPos - lights[0].worldPos;
     float closestDepth = texture(shadowMap, fragToLight).r; // depth as seen from light
-    closestDepth *= light.radius;
-    return vec4(vec3(closestDepth / light.radius), 1.0);
+    closestDepth *= lights[0].radius;
+    return vec4(vec3(closestDepth / lights[0].radius), 1.0);
 }
 
 void main() {

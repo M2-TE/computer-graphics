@@ -21,6 +21,7 @@ FetchContent_Declare(cmrc GIT_REPOSITORY "https://github.com/vector-of-bool/cmrc
 FetchContent_Declare(glbinding GIT_REPOSITORY "https://github.com/cginternals/glbinding.git" GIT_TAG "master")
 FetchContent_Declare(sponza GIT_REPOSITORY "https://github.com/jimmiebergmann/Sponza.git" GIT_TAG "master" SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/models/sponza")
 FetchContent_MakeAvailable(sdl3 assimp glm stb cmrc glbinding sponza)
+set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Faster config after FetchContent has run once" FORCE)
 find_package(OpenGL REQUIRED COMPONENTS)
 
 file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*")

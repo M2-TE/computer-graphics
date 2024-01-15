@@ -54,6 +54,16 @@ struct App {
                 light.draw();
                 model.draw();
             }
+             for (int face = 0; face < 6; face++) {
+                // set framebuffer texture and clear it
+                glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, light.shadowCubemap, 0, face);
+                glClear(GL_DEPTH_BUFFER_BIT);
+                // bind resources to pipeline
+                lightB.bind_write(face);
+                // draw models
+                light.draw();
+                model.draw();
+            }
 
             // second pass: render color map
             glViewport(0, 0, window.width, window.height);
@@ -62,7 +72,8 @@ struct App {
             colorPipeline.bind();
             // bind resources to pipeline
             camera.bind();
-            light.bind_read(1);
+            light.bind_read(0, 1);
+            // lightB.bind_read(1, 2);
             // draw models
             light.draw();
             model.draw();
@@ -110,4 +121,5 @@ private:
     Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");
     Camera camera = Camera({1, 2, 1}, {0, 0, 0}, window.width, window.height);
     PointLight light = PointLight({1, 1, 0}, {0, 0, 0}, {1, 1, 1}, 30.0f);
+    PointLight lightB = PointLight({4, 1, 0}, {0, 0, 0}, {1, 1, 1}, 30.0f);
 };

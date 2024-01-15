@@ -41,7 +41,7 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
     glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue, { "glGetError" });
     glbinding::setAfterCallback([](const glbinding::FunctionCall& call) {
         static unsigned int callCount = 0;
-        static constexpr unsigned int maxCalls = 10;
+        static constexpr unsigned int maxCalls = 3;
 
         const auto errorCode = glGetError();
         if (errorCode != GL_NO_ERROR)
