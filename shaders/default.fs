@@ -102,6 +102,6 @@ vec4 calc_debug() {
 }
 
 void main() {
-    pixelColor = calc_light();
-    // pixelColor = calc_debug();
+    // pixelColor = calc_light();
+    pixelColor = calc_debug();
 }

@@ -66,10 +66,9 @@ private:
     }
     void draw_ui() {
         // ImGui::ShowDemoWindow();
-        ImGui::Begin("FPS_Overlay");
-        ImGui::Text("FPS (acc): %.2f", timer.get_fps());
-        ImGui::Text("FPS (est): %.2f", ImGui::GetIO().Framerate);
-        bool bPressed = ImGui::Button("testbutton", { 200, 200});
+        ImGui::Begin("FPS_Overlay", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
+        ImGui::Text("%.1f fps", ImGui::GetIO().Framerate);
+        ImGui::Text("%.1f ms", ImGui::GetIO().DeltaTime * 1000.0f);
         ImGui::End();
     }
     void draw() {
