@@ -66,36 +66,38 @@ private:
     }
     void draw_ui() {
         // ImGui::ShowDemoWindow();
-        ImGui::Begin("FPS_Overlay", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoTitleBar);
+        ImGui::Begin("FPS_Overlay", nullptr, ImGuiWindowFlags_NoDecoration
+            | ImGuiWindowFlags_NoDocking
+            // | ImGuiWindowFlags_AlwaysAutoResize
+            | ImGuiWindowFlags_NoSavedSettings
+            | ImGuiWindowFlags_NoFocusOnAppearing
+            | ImGuiWindowFlags_NoNav);
+        ImGui::SetNextWindowBgAlpha(0.35f);
         ImGui::Text("%.1f fps", ImGui::GetIO().Framerate);
         ImGui::Text("%.1f ms", ImGui::GetIO().DeltaTime * 1000.0f);
         ImGui::End();
     }
     void draw() {
         // first pass: render shadow map
-        light.adjust_viewport();
         glBindFramebuffer(GL_FRAMEBUFFER, shadowPipeline.framebuffer);
         shadowPipeline.bind();
-        // render each cubemap face (omnidirectional shadows)
-        for (int face = 0; face < 6; face++) {
-            // set framebuffer texture and clear it
-            glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, light.shadowCubemap, 0, face);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            // bind resources to pipeline
-            light.bind_write(face);
-            // draw models
-            lightB.draw();
-            model.draw();
-        }
+        // for each light
+        for (size_t iLight = 0; iLight < lights.size(); iLight++) {
+            lights[iLight].adjust_viewport();
+            // render each cubemap face
             for (int face = 0; face < 6; face++) {
-            // set framebuffer texture and clear it
-            glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, lightB.shadowCubemap, 0, face);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            // bind resources to pipeline
-            lightB.bind_write(face);
-            // draw models
-            light.draw();
-            model.draw();
+                // set framebuffer texture and clear it
+                glNamedFramebufferTextureLayer(shadowPipeline.framebuffer, GL_DEPTH_ATTACHMENT, lights[iLight].shadowCubemap, 0, face);
+                glClear(GL_DEPTH_BUFFER_BIT);
+                // bind resources to pipeline
+                lights[iLight].bind_write(face);
+                // draw models
+                model.draw();
+                // draw other light models
+                for (size_t i = 0; i < lights.size(); i++) {
+                    if (i != iLight) lights[i].draw();
+                }
+            }
         }
 
         // second pass: render color map
@@ -105,11 +107,11 @@ private:
         colorPipeline.bind();
         // bind resources to pipeline
         camera.bind();
-        light.bind_read(0, 1);
-        lightB.bind_read(1, 2);
+        for (size_t iLight = 0; iLight < lights.size(); iLight++) {
+            lights[iLight].bind_read(iLight, iLight + 1);
+        }
         // draw models
-        light.draw();
-        lightB.draw();
+        for (auto& light : lights) light.draw();
         model.draw();
     }
     void handle_inputs() {
@@ -146,6 +148,8 @@ private:
     Pipeline shadowPipeline = Pipeline("shaders/shadowmapping.vs", "shaders/shadowmapping.fs");
     Model model = Model({0, 0, 0}, {0, 0, 0}, {.01, .01, .01}, "models/sponza/sponza.obj");
     Camera camera = Camera({1, 2, 1}, {0, 0, 0}, window.width, window.height);
-    PointLight light = PointLight({1, 1, 0}, {0, 0, 0}, {1, 1, 1}, 30.0f);
-    PointLight lightB = PointLight({4, 1, 0}, {0, 0, 0}, {1, 1, 1}, 30.0f);
+    std::array<PointLight, 2> lights = {
+        PointLight({1, 2, 0}, {0, 0, 0}, {1, 1, 1}, 30.0f),
+        PointLight({2, 4, 1}, {0, 0, 0}, {1, 1, 1}, 30.0f),
+    };
 };

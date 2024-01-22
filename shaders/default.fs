@@ -58,7 +58,9 @@ vec3 calc_specular(uint i) {
 float calc_shadow(uint i) {
     vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
     vec3 fragToLight = worldPos - lights[i].worldPos;
-    float bias = max(0.5 * (1.0 - dot(normal, lightDir)), 0.005);  
+    float bias_max = 1.0;
+    float bias_min = 0.005;
+    float bias = max((1.0 - dot(normal, lightDir) * bias_max), bias_min);  
     float currentDepth = length(fragToLight);
     
     // percentage closer filter
@@ -83,8 +85,15 @@ vec4 calc_light() {
     vec3 diffuseColor = vec3(0.0, 0.0, 0.0);
     for (uint i = 0; i < N_LIGHTS; i++) {
         float shadow = calc_shadow(i);
-        diffuseColor += calc_diffuse(i) * shadow;
-        specularColor += calc_specular(i) * shadow;
+
+        vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
+        float lightDist = length(lightDir);
+        float linear = 0.14;
+        float quad = 0.07;
+        float attenuation = 1.0 / (1.0 + lightDist * linear + lightDist * lightDist * quad);
+        // attenuation = 1.0;
+        diffuseColor += calc_diffuse(i) * shadow * attenuation;
+        specularColor += calc_specular(i) * shadow * attenuation;
     }
 
     // blend texture/vertex colors
@@ -102,6 +111,6 @@ vec4 calc_debug() {
 }
 
 void main() {
-    // pixelColor = calc_light();
-    pixelColor = calc_debug();
+    pixelColor = calc_light();
+    // pixelColor = calc_debug();
 }

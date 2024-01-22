@@ -83,6 +83,7 @@ Window::Window(int window_width, int window_height, int nSamples = 1) : width(wi
     glClearColor(.5f, .5f, .5f, 1.0f); // default screen color
     glEnable(GL_CULL_FACE); // cull backfaces
     glEnable(GL_DEPTH_TEST); // enable depth buffer and depth testing
+    // glEnable(GL_FRAMEBUFFER_SRGB); // gamma corrected framebuffer
     SDL_SetRelativeMouseMode(SDL_TRUE); // capture mouse for better camera controls
     SDL_GL_SetSwapInterval(1); // vsync
     if (nSamples > 1) {
