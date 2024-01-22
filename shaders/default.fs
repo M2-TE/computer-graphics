@@ -34,19 +34,19 @@ layout (location = 23) uniform Light lights[N_LIGHTS]; // 23, 26
 layout (binding = 0) uniform sampler2D diffuseTexture;
 layout (binding = 1) uniform samplerCube shadowMaps[N_LIGHTS]; // binding 1, 2
 
- // indirect scattered light
+// indirect scattered light
 vec3 calc_ambient() {
     float ambientStrength = 1.0; // ambient modifier
     return ambientStrength * material.ambient + material.diffuse * 0.1;
 }
- // direct light
+// direct light
 vec3 calc_diffuse(uint i) {
     vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
     float diffuseStrength = dot(normal, lightDir); // calc intensity of light
     diffuseStrength = max(diffuseStrength, 0.0); // filter out negative intensity
     return lights[i].color * diffuseStrength * material.diffuse;
 }
- // direct light specular highlights
+// direct light specular highlights
 vec3 calc_specular(uint i) {
     vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
     vec3 cameraDir = normalize(camera.worldPos - worldPos); // unit vector from camera to fragment
