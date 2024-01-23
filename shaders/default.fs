@@ -78,6 +78,20 @@ float calc_shadow(uint i) {
     }
     return shadow / (samples * samples * samples);
 }
+float calc_shadow_perf(uint i) {
+    vec3 lightDir = normalize(lights[i].worldPos - worldPos); // unit vector from light to fragment
+    vec3 fragToLight = worldPos - lights[i].worldPos;
+    float bias_max = 1.0;
+    float bias_min = 0.005;
+    float bias = max((1.0 - dot(normal, lightDir) * bias_max), bias_min);  
+    float currentDepth = length(fragToLight);
+
+    float closestDepth = texture(shadowMaps[i], fragToLight).r; 
+    closestDepth *= lights[i].radius;
+    float shadow = 0.0;
+    if(currentDepth - bias < closestDepth) shadow += 1.0;
+    return shadow;
+}
 vec4 calc_light() {
     // calculate lighting
     vec3 ambientColor = calc_ambient();

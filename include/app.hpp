@@ -65,14 +65,12 @@ private:
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
     void draw_ui() {
-        // ImGui::ShowDemoWindow();
+        ImGui::SetNextWindowBgAlpha(0.35f);
         ImGui::Begin("FPS_Overlay", nullptr, ImGuiWindowFlags_NoDecoration
             | ImGuiWindowFlags_NoDocking
-            // | ImGuiWindowFlags_AlwaysAutoResize
             | ImGuiWindowFlags_NoSavedSettings
             | ImGuiWindowFlags_NoFocusOnAppearing
             | ImGuiWindowFlags_NoNav);
-        ImGui::SetNextWindowBgAlpha(0.35f);
         ImGui::Text("%.1f fps", ImGui::GetIO().Framerate);
         ImGui::Text("%.1f ms", ImGui::GetIO().DeltaTime * 1000.0f);
         ImGui::End();
@@ -83,6 +81,7 @@ private:
         shadowPipeline.bind();
         // for each light
         for (size_t iLight = 0; iLight < lights.size(); iLight++) {
+            if (bShadowmapsRendered) break;
             lights[iLight].adjust_viewport();
             // render each cubemap face
             for (int face = 0; face < 6; face++) {
@@ -99,6 +98,7 @@ private:
                 }
             }
         }
+        bShadowmapsRendered = true;
 
         // second pass: render color map
         glViewport(0, 0, window.width, window.height);
@@ -143,6 +143,7 @@ private:
     Timer timer;
     Window window = Window(1280, 720, 4);
     bool bRunning = true;
+    bool bShadowmapsRendered = false;
     // render resources
     Pipeline colorPipeline = Pipeline("shaders/default.vs", "shaders/default.fs");
     Pipeline shadowPipeline = Pipeline("shaders/shadowmapping.vs", "shaders/shadowmapping.fs");

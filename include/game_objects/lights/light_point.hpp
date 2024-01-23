@@ -10,14 +10,8 @@ struct PointLight : public Light {
         glTextureParameteri(shadowCubemap, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(shadowCubemap, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTextureParameteri(shadowCubemap, GL_TEXTURE_WRAP_R, GL_REPEAT);
-        glTextureParameteri(shadowCubemap, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTextureParameteri(shadowCubemap, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        // anisotropic filtering
-        GLfloat anisotropicFiltering;
-        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &anisotropicFiltering);
-        anisotropicFiltering = std::min(anisotropicFiltering, 8.0f);
-        glTextureParameterf(shadowCubemap, GL_TEXTURE_MAX_ANISOTROPY, anisotropicFiltering);
+        glTextureParameteri(shadowCubemap, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(shadowCubemap, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         // create shadow camera matrices
         shadowProjection = glm::perspectiveFov(glm::radians(90.0f), shadowWidth, shadowHeight, 1.0f, radius);
