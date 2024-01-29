@@ -28,12 +28,14 @@ find_package(OpenGL REQUIRED COMPONENTS)
 
 # embedding of cmrc resources
 file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*")
-cmrc_add_resource_library(shaders "${shader-files}") # embed shaders into library "shaders"
+cmrc_add_resource_library(shaders "${shader-files}") # embed shaders
 file(GLOB_RECURSE image-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "images/*")
-cmrc_add_resource_library(images "${image-files}") # embed images into library "images"
+cmrc_add_resource_library(images "${image-files}") # embed images
+file(GLOB_RECURSE audio-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "audio/*")
+cmrc_add_resource_library(audio "${audio-files}") # embed audio
 
-# copy audio data next to executable
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/audio/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/bin/audio/")
+# copy audio data next to executable (if no cmrc embed is desired)
+# file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/audio/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/bin/audio/")
 
 # create executable target
 file(GLOB_RECURSE source-files CONFIGURE_DEPENDS "src/*")
@@ -55,7 +57,7 @@ target_link_libraries(${PROJECT_NAME} SDL3_mixer::SDL3_mixer)
 target_link_libraries(${PROJECT_NAME} OpenGL::GL) # OpenGL headers
 target_link_libraries(${PROJECT_NAME} glbinding::glbinding) # OpenGL function loader
 target_link_libraries(${PROJECT_NAME} assimp stb-image) # model/image loading
-target_link_libraries(${PROJECT_NAME} shaders images) # CMRC embedded files
+target_link_libraries(${PROJECT_NAME} shaders images audio) # CMRC embedded files
 
 # only embed models with CMRC if desired
 if (${PREFER_EMBED_MODELS})
