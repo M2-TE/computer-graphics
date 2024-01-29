@@ -6,33 +6,18 @@ CMRC_DECLARE(audio);
 struct Audio {
     Audio() {
         // open audio device
-        // SDL_AudioSpec spec = {};
         if (Mix_OpenAudio(0, nullptr)) std::cout << SDL_GetError();
-
-        // // load audio sample
-        // auto* sample = samples.emplace_back(Mix_LoadWAV("audio/Bass-Drum-1.wav"));
-        // if (sample == nullptr) std::cout << SDL_GetError();
-
-        // // load music track
-        // auto* music = tracks.emplace_back(Mix_LoadMUS("audio/doom.mp3"));
-        // if (music == nullptr) std::cout << SDL_GetError();
-        // Mix_PlayMusic(music, 0); // immediately play music
-        // // Mix_PauseMusic();
-        // // Mix_ResumeMusic();
 
         // load audio sample
         samples.emplace_back(load_chunk("audio/Bass-Drum-1.wav"));
         tracks.emplace_back(load_music("audio/doom.mp3"));
         Mix_PlayMusic(tracks[0], 0); // immediately play music
+        // Mix_PauseMusic();
+        // Mix_ResumeMusic();
     }
     ~Audio() {
-        for (auto* sample: samples) {
-            Mix_FreeChunk(sample);
-        }
-
-        for (auto* track: tracks) {
-            Mix_FreeMusic(track);
-        }
+        for (auto* sample : samples) Mix_FreeChunk(sample);
+        for (auto* track : tracks) Mix_FreeMusic(track);
 
         Mix_CloseAudio();
         Mix_Quit();
