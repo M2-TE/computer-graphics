@@ -6,8 +6,10 @@
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_opengl3.h>
+//
 #include <iostream>
 #include <cassert>
+//
 #include "window.hpp"
 
 Window::Window(int window_width, int window_height, int nSamples = 1) : width(window_width), height(window_height) {

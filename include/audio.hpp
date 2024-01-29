@@ -1,8 +1,10 @@
 #pragma once
 #include <SDL3_mixer/SDL_mixer.h>
 #include <cmrc/cmrc.hpp>
-CMRC_DECLARE(audio);
+//
+#include <string_view>
 
+CMRC_DECLARE(audio);
 struct Audio {
     Audio() {
         // open audio device

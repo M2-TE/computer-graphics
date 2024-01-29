@@ -33,7 +33,7 @@ struct App {
 
     int run() {
         while(bRunning) {
-            input.flush(); // flush input from last frame
+            Input::flush(); // flush input from last frame
             timer.update(); // update delta time
             
             SDL_Event event;
@@ -41,7 +41,7 @@ struct App {
                 if (event.type == SDL_EventType::SDL_EVENT_QUIT) bRunning = false;
                 ImGui_ImplSDL3_ProcessEvent(&event);
                 window.handle_event(event); // handle window resize and such events
-                input.handle_event(event); // handle keyboard/mouse events
+                Input::register_event(event); // handle keyboard/mouse events
             }
             handle_inputs();
             imgui_begin();
@@ -118,32 +118,31 @@ private:
     }
     void handle_inputs() {
         // draw wireframe while holding f
-        if (input.get_key_down(SDL_KeyCode::SDLK_f)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        if (Keys::down('f')) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // capture mouse for better camera controls
-        if (input.get_key_pressed(SDL_KeyCode::SDLK_ESCAPE)) SDL_SetRelativeMouseMode(!SDL_GetRelativeMouseMode());
+        if (Keys::pressed(SDL_KeyCode::SDLK_ESCAPE)) SDL_SetRelativeMouseMode(!SDL_GetRelativeMouseMode());
 
         // camera movement
         float movementSpeed = timer.get_delta() * 2.0f; // scale speed relative to framerate
-        if (input.get_key_down(SDL_KeyCode::SDLK_LSHIFT)) movementSpeed *= 3.0f; // sprint button
-        if (input.get_key_down(SDL_KeyCode::SDLK_s)) camera.translate(0.0f, 0.0f, movementSpeed);
-        if (input.get_key_down(SDL_KeyCode::SDLK_w)) camera.translate(0.0f, 0.0f, -movementSpeed);
-        if (input.get_key_down(SDL_KeyCode::SDLK_e)) camera.translate(0.0f, movementSpeed, 0.0f);
-        if (input.get_key_down(SDL_KeyCode::SDLK_q)) camera.translate(0.0f, -movementSpeed, 0.0f);
-        if (input.get_key_down(SDL_KeyCode::SDLK_d)) camera.translate(movementSpeed, 0.0f, 0.0f);
-        if (input.get_key_down(SDL_KeyCode::SDLK_a)) camera.translate(-movementSpeed, 0.0f, 0.0f);
+        if (Keys::pressed(SDL_KeyCode::SDLK_LSHIFT)) movementSpeed *= 3.0f; // sprint button
+        if (Keys::down('s')) camera.translate(0.0f, 0.0f, movementSpeed);
+        if (Keys::down('w')) camera.translate(0.0f, 0.0f, -movementSpeed);
+        if (Keys::down('e')) camera.translate(0.0f, movementSpeed, 0.0f);
+        if (Keys::down('q')) camera.translate(0.0f, -movementSpeed, 0.0f);
+        if (Keys::down('d')) camera.translate(movementSpeed, 0.0f, 0.0f);
+        if (Keys::down('a')) camera.translate(-movementSpeed, 0.0f, 0.0f);
         
-        if (input.get_key_pressed(SDL_KeyCode::SDLK_r)) Mix_PlayChannel(-1, audio.samples[0], 0);
+        if (Keys::pressed('r')) Mix_PlayChannel(-1, audio.samples[0], 0);
 
         // camera rotation
         float rotationSpeed = 0.001f;
-        camera.rotation.x -= rotationSpeed * input.get_mouse_delta().second;
-        camera.rotation.y -= rotationSpeed * input.get_mouse_delta().first;
+        camera.rotation.x -= rotationSpeed * Mouse::delta().second;
+        camera.rotation.y -= rotationSpeed * Mouse::delta().first;
     }
 
 private:
-    Input input;
     Timer timer;
     Window window = Window(1280, 720, 4);
     bool bRunning = true;
