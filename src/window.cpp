@@ -11,7 +11,7 @@
 #include "window.hpp"
 
 Window::Window(int window_width, int window_height, int nSamples = 1) : width(window_width), height(window_height) {
-    if (SDL_InitSubSystem(SDL_InitFlags::SDL_INIT_VIDEO)) std::cout << SDL_GetError();
+    if (SDL_InitSubSystem(SDL_InitFlags::SDL_INIT_VIDEO | SDL_InitFlags::SDL_INIT_AUDIO)) std::cout << SDL_GetError();
 
     // set opengl version
     SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_PROFILE_MASK, SDL_GLprofile::SDL_GL_CONTEXT_PROFILE_CORE);

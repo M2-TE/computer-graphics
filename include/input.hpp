@@ -14,6 +14,7 @@ public:
         switch (event.type) {
             // keyboard events
             case SDL_EventType::SDL_EVENT_KEY_DOWN:
+                if (event.key.repeat) return;
                 keysPressed.insert(event.key.keysym.sym);
                 keysDown.insert(event.key.keysym.sym);
                 break;
