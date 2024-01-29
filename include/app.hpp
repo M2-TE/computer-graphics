@@ -17,6 +17,7 @@ using namespace gl;
 #include "pipeline.hpp"
 #include "input.hpp"
 #include "timer.hpp"
+#include "audio.hpp"
 #include "game_objects/model.hpp"
 #include "game_objects/lights/light_point.hpp"
 #include "game_objects/camera.hpp"
@@ -28,12 +29,6 @@ struct App {
         // attach texture to frame buffer (only draw to depth, no color output!)
         glNamedFramebufferReadBuffer(shadowPipeline.framebuffer, GL_NONE);
         glNamedFramebufferDrawBuffer(shadowPipeline.framebuffer, GL_NONE);
-
-        // SDL_AudioSpec spec;
-        SDL_AudioSpec spec = {};
-        if (Mix_OpenAudio(0, &spec)) std::cout << SDL_GetError();
-        auto* sample = samples.emplace_back(Mix_LoadWAV("Bass-Drum-1.wav"));
-        if (sample == nullptr) std::cout << SDL_GetError();
     }
 
     int run() {
@@ -139,7 +134,7 @@ private:
         if (input.get_key_down(SDL_KeyCode::SDLK_d)) camera.translate(movementSpeed, 0.0f, 0.0f);
         if (input.get_key_down(SDL_KeyCode::SDLK_a)) camera.translate(-movementSpeed, 0.0f, 0.0f);
         
-        if (input.get_key_pressed(SDL_KeyCode::SDLK_r)) Mix_PlayChannel(-1, samples[0], 0);
+        if (input.get_key_pressed(SDL_KeyCode::SDLK_r)) Mix_PlayChannel(-1, audio.samples[0], 0);
 
         // camera rotation
         float rotationSpeed = 0.001f;
@@ -162,5 +157,5 @@ private:
         PointLight({1, 2, 0}, {0, 0, 0}, {1, 1, 1}, 30.0f),
         PointLight({2, 4, 1}, {0, 0, 0}, {1, 1, 1}, 30.0f),
     };
-    std::vector<Mix_Chunk*> samples;
+    Audio audio;
 };
