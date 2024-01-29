@@ -26,10 +26,14 @@ FetchContent_MakeAvailable(sdl3 sdl3mixer assimp glm stb cmrc glbinding imgui sp
 set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Faster config after FetchContent has run once" FORCE)
 find_package(OpenGL REQUIRED COMPONENTS)
 
+# embedding of cmrc resources
 file(GLOB_RECURSE shader-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "shaders/*")
 cmrc_add_resource_library(shaders "${shader-files}") # embed shaders into library "shaders"
 file(GLOB_RECURSE image-files RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "images/*")
 cmrc_add_resource_library(images "${image-files}") # embed images into library "images"
+
+# copy audio data next to executable
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/audio/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/bin/audio/")
 
 # create executable target
 file(GLOB_RECURSE source-files CONFIGURE_DEPENDS "src/*")

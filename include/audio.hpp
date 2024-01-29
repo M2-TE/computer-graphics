@@ -15,6 +15,8 @@ struct Audio {
         auto* music = tracks.emplace_back(Mix_LoadMUS("audio/doom.mp3"));
         if (music == nullptr) std::cout << SDL_GetError();
         Mix_PlayMusic(music, 0); // immediately play music
+        // Mix_PauseMusic();
+        // Mix_ResumeMusic();
     }
     ~Audio() {
         for (auto* sample: samples) {
