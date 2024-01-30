@@ -19,3 +19,5 @@ set(SDL_FILESYSTEM   ON  CACHE BOOL "Disable SDL Filesystem subsystem" FORCE)
 set(SDL_SENSOR       OFF CACHE BOOL "Disable SDL Sensor subsystem" FORCE)
 set(SDL_LOCALE       ON  CACHE BOOL "Disable SDL Locale subsystem" FORCE)
 set(SDL_MISC         ON  CACHE BOOL "Disable SDL Misc subsystem" FORCE)
+
+set(SDL3MIXER_VENDORED ON)

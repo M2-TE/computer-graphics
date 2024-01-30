@@ -18,8 +18,8 @@ struct Audio {
         // Mix_ResumeMusic();
     }
     ~Audio() {
-        for (auto* sample : samples) Mix_FreeChunk(sample);
-        for (auto* track : tracks) Mix_FreeMusic(track);
+        for (auto* sample: samples) Mix_FreeChunk(sample);
+        for (auto* track: tracks) Mix_FreeMusic(track);
 
         Mix_CloseAudio();
         Mix_Quit();

@@ -2,8 +2,8 @@
 #include "game_objects/model.hpp"
 
 struct Light {
-    Light(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale) 
-    : transform(pos, rot, scale) {
+    Light(glm::vec3 pos, glm::vec3 rot, glm::vec3 scale):
+            transform(pos, rot, scale) {
         mesh.load_sphere(36, 36, true);
         material.diffuse = lightColor;
     }
