@@ -13,7 +13,7 @@ include(MiscSettings)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF) # enable git output for FetchContent steps
-FetchContent_Declare(sdl3 GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git" GIT_TAG "main")
+FetchContent_Declare(sdl3 GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git" GIT_TAG "495e432fb9776fdc13a8d96179136064ccddf6e5")
 FetchContent_Declare(sdl3mixer GIT_REPOSITORY "https://github.com/libsdl-org/SDL_mixer.git" GIT_TAG "main")
 FetchContent_Declare(assimp GIT_REPOSITORY "https://github.com/assimp/assimp.git" GIT_TAG "master")
 FetchContent_Declare(glm GIT_REPOSITORY "https://github.com/g-truc/glm.git" GIT_TAG "bf71a834948186f4097caa076cd2663c69a10e1e")
