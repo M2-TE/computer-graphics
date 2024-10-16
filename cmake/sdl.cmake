@@ -1,11 +1,15 @@
-# build settings for SDL
+set(SDL_EXAMPLES OFF)
 set(SDL_TEST_LIBRARY OFF)
 set(SDL_DISABLE_INSTALL ON)
 set(SDL_DISABLE_UNINSTALL ON)
+# render backends
+set(SDL_RENDER OFF)
 set(SDL_VULKAN ON)
-set(SDL_DIRECTX OFF)
+set(SDL_METAL OFF)
 set(SDL_OPENGL OFF)
 set(SDL_OPENGLES OFF)
+set(SDL_DIRECTX OFF)
+# set library type
 set(SDL_SHARED OFF)
 set(SDL_STATIC ON)
 
