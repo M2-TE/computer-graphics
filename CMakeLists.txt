@@ -22,3 +22,4 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON) # speed up consecutive config runs
 include(sdl)
 include(vulkan)
 include(fmt)
+# set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Faster config after FetchContent has run once" FORCE)
