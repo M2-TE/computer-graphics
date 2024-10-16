@@ -26,7 +26,15 @@ struct Window {
         layers.push_back("VK_LAYER_KHRONOS_validation");
 
         // Vulkan: create vulkan instance and supply it with info about the application
+        vk::ApplicationInfo info_app {
+            .pApplicationName = name.c_str(),
+            .applicationVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
+            .pEngineName = "TBD",
+            .engineVersion = VK_MAKE_API_VERSION(0, 1, 0, 0),
+            .apiVersion = vk::ApiVersion13
+        };
         _instance = vk::createInstance({
+            .pApplicationInfo = &info_app,
             .enabledLayerCount = (uint32_t)layers.size(),
             .ppEnabledLayerNames = layers.data(),
             .enabledExtensionCount = extensions_n,
