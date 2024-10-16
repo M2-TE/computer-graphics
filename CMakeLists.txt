@@ -9,7 +9,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 17)
 
 # create renderer executable
-add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+add_executable(${PROJECT_NAME} 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ext.cpp"
+)
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # fetch project dependencies
@@ -17,5 +20,5 @@ include(FetchContent)
 set(FETCHCONTENT_QUIET OFF) # enable git output for FetchContent steps
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON) # speed up consecutive config runs
 include(sdl)
-include(opengl)
+include(vulkan)
 include(fmt)
