@@ -22,7 +22,7 @@ struct Engine {
     }
     void execute_frame() {
         // read vertex shader data
-        std::ifstream vs_file("shaders/default.vs", std::ios::binary);
+        std::ifstream vs_file("shaders/default.vert", std::ios::binary);
         vs_file.seekg(0, std::ios::end);
         std::streamsize vs_size = vs_file.tellg();
         vs_file.seekg(0, std::ios::beg);
@@ -43,7 +43,7 @@ struct Engine {
         }
 
         // read fragment shader data
-        std::ifstream fs_file("shaders/default.fs", std::ios::binary);
+        std::ifstream fs_file("shaders/default.frag", std::ios::binary);
         fs_file.seekg(0, std::ios::end);
         std::streamsize fs_size = fs_file.tellg();
         fs_file.seekg(0, std::ios::beg);
