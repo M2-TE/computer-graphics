@@ -6,10 +6,11 @@
 #include <fmt/base.h>
 #include "window.hpp"
 #include "input.hpp"
+#include "transform.hpp"
 
 struct Engine {
     void init() {
-        _window.init(1280, 720, "OpenGL Renderer");
+        _window.init(720, 720, "OpenGL Renderer");
 
         // read vertex shader data
         std::ifstream vs_file("../shaders/default.vert", std::ios::binary);
@@ -69,11 +70,36 @@ struct Engine {
             glm::vec4 position;
             glm::vec4 color;
         };
+        float n = -0.5f; // for readability
+        float p = 0.5f; // for readability
         std::vector<Vertex> vertices = {
-            { glm::vec4(-.5, -.5, 0, 1), glm::vec4(1, 0, 0, 1) },
-            { glm::vec4(.5, -.5, 0, 1), glm::vec4(0, 1, 0, 1) },
-            { glm::vec4(0, .5, 0, 1), glm::vec4(0, 0, 1, 1) },
+            // pos, norm, uv/st, col
+            {{n, n, p, 1}, {1, 0, 0, 1}}, // front
+            {{p, n, p, 1}, {1, 0, 0, 1}},
+            {{n, p, p, 1}, {1, 0, 0, 1}},
+            {{p, p, p, 1}, {1, 0, 0, 1}},
+            {{n, n, n, 1}, {1, 0, 0, 1}}, // back
+            {{p, n, n, 1}, {1, 0, 0, 1}},
+            {{n, p, n, 1}, {1, 0, 0, 1}},
+            {{p, p, n, 1}, {1, 0, 0, 1}},
+            {{n, n, n, 1}, {0, 1, 0, 1}}, // left
+            {{n, n, p, 1}, {0, 1, 0, 1}},
+            {{n, p, n, 1}, {0, 1, 0, 1}},
+            {{n, p, p, 1}, {0, 1, 0, 1}},
+            {{p, n, n, 1}, {0, 1, 0, 1}}, // right
+            {{p, n, p, 1}, {0, 1, 0, 1}},
+            {{p, p, n, 1}, {0, 1, 0, 1}},
+            {{p, p, p, 1}, {0, 1, 0, 1}},
+            {{n, p, n, 1}, {0, 0, 1, 1}}, // top
+            {{n, p, p, 1}, {0, 0, 1, 1}},
+            {{p, p, n, 1}, {0, 0, 1, 1}},
+            {{p, p, p, 1}, {0, 0, 1, 1}},
+            {{n, n, n, 1}, {0, 0, 1, 1}}, // bottom
+            {{n, n, p, 1}, {0, 0, 1, 1}},
+            {{p, n, n, 1}, {0, 0, 1, 1}},
+            {{p, n, p, 1}, {0, 0, 1, 1}},
         };
+        
         // describe vertex buffer
         GLsizeiptr vertex_byte_count = vertices.size() * sizeof(Vertex);
         glCreateBuffers(1, &vertex_buffer_object);
@@ -81,7 +107,14 @@ struct Engine {
         glNamedBufferStorage(vertex_buffer_object, vertex_byte_count, vertices.data(), BufferStorageMask::GL_NONE_BIT);
 
         // create indices
-        std::vector<uint32_t> indices = { 2, 1, 0 };
+        std::vector<uint32_t> indices = {
+            0, 1, 3, 3, 2, 0, // front
+            5, 4, 7, 7, 4, 6, // back
+            8, 9, 11, 11, 10, 8, // left
+            13, 12, 15, 15, 12, 14, // right
+            16, 17, 19, 19, 18, 16, // top
+            23, 21, 20, 23, 20, 22, // bottom
+        };
         index_count = indices.size();
         // describe index buffer (element buffer)
         GLsizeiptr element_byte_count = vertices.size() * sizeof(Vertex);
@@ -131,18 +164,25 @@ struct Engine {
     }
     void execute_frame() {
         // draw
+        if (Keys::down('w')) _transform.position.y += 0.01f;
+        if (Keys::down('s')) _transform.position.y -= 0.01f;
+        if (Keys::down('d')) _transform.position.x += 0.01f;
+        if (Keys::down('a')) _transform.position.x -= 0.01f;
+        if (Keys::down('q')) _transform.rotation += 0.01f;
+        if (Keys::down('e')) _transform.rotation -= 0.01f;
+        if (Mouse::down(Mouse::ids::left)) _transform.scale += 0.01f;
+        if (Mouse::down(Mouse::ids::right)) _transform.scale -= 0.01f;
         glClearColor(0.1, 0.1, 0.1, 0.0); // theoretically only needs to be set once
-        if (Keys::down('a')) glClearColor(0.1, 0.5, 0.1, 0.0);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(shader_program);
-        // bind vertex offset uniform to the currently active graphics pipeline (shader_program)
-        glUniform4f(0, 0.0, 0.5, 0.0, 0.0);
+        _transform.bind();
         glBindVertexArray(vertex_array_object);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
         SDL_GL_SwapWindow(_window._window_p);
     }
 
     Window _window;
+    Transform _transform;
     GLuint shader_program;
     GLuint vertex_buffer_object;
     GLuint element_buffer_object;

@@ -6,9 +6,9 @@ layout (location = 1) in vec4 in_col;
 // output
 layout (location = 0) out vec4 out_col;
 // uniforms
-layout (location = 0) uniform vec4 vert_offset;
+layout (location = 0) uniform mat4x4 model_transform;
 
 void main() {
-    gl_Position = in_pos + vert_offset;
+    gl_Position = model_transform * in_pos;
     out_col = in_col;
 }

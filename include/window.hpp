@@ -69,6 +69,10 @@ struct Window {
                 }
             }
         });
+
+        glEnable(GL_CULL_FACE); // cull backfaces
+        glEnable(GL_DEPTH_TEST); // enable depth buffer and depth testing
+        // glEnable(GL_FRAMEBUFFER_SRGB); // gamma corrected framebuffer
     }
     void destroy() {
         SDL_Quit();

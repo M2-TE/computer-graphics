@@ -9,11 +9,11 @@ struct Pipeline {
     }
     // clean up shader program object
     void destroy() {
-        glDeleteProgram(shader_program);
+        glDeleteProgram(_shader_program);
     }
     // bind the shader program (needs to be done before binding meshes or uniforms)
     void bind() {
-        glUseProgram(shader_program);
+        glUseProgram(_shader_program);
     }
-    GLuint shader_program;
+    GLuint _shader_program;
 };
