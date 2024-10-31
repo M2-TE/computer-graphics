@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <glbinding/gl46core/gl.h>
-// #include <glbinding/gl/extension.h>
 #include "glbinding/AbstractFunction.h"
 #include <glbinding/glbinding.h>
 #include <SDL3/SDL.h>
@@ -30,7 +29,7 @@ struct Window {
         if (_context == nullptr) fmt::println("{}", SDL_GetError());
 
         // lazy loader for OpenGL functions
-        glbinding::initialize(SDL_GL_GetProcAddress, false);
+        glbinding::initialize(SDL_GL_GetProcAddress, true);
         // enable error logging
         glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue, { "glGetError" });
         glbinding::setAfterCallback([](const glbinding::FunctionCall& call) {

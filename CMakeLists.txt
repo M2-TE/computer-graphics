@@ -3,7 +3,7 @@ project(opengl-renderer LANGUAGES C CXX)
 
 # some settings
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS OFF)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 17)
@@ -12,9 +12,6 @@ set(CMAKE_C_STANDARD 17)
 add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-# copy shaders to binary dir
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/shaders" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-
 # fetch project dependencies
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF) # enable git output for FetchContent steps
@@ -22,3 +19,4 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON) # speed up consecutive config runs
 include(sdl)
 include(opengl)
 include(fmt)
+include(glm)
