@@ -52,13 +52,13 @@ struct Engine {
         }
 
         // to combine all shader stages, we create a shader program
-        shader_program = glCreateProgram();
-        glAttachShader(shader_program, vertex_shader);
-        glAttachShader(shader_program, fragment_shader);
-        glLinkProgram(shader_program);
-        glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
+        _shader_program = glCreateProgram();
+        glAttachShader(_shader_program, vertex_shader);
+        glAttachShader(_shader_program, fragment_shader);
+        glLinkProgram(_shader_program);
+        glGetProgramiv(_shader_program, GL_LINK_STATUS, &success);
         if (!success) {
-            glGetProgramInfoLog(shader_program, info_log.size(), nullptr, info_log.data());
+            glGetProgramInfoLog(_shader_program, info_log.size(), nullptr, info_log.data());
             fmt::print("{}", info_log.data());
         }
         // clean up shaders after they were compiled and linked
@@ -102,9 +102,9 @@ struct Engine {
         
         // describe vertex buffer
         GLsizeiptr vertex_byte_count = vertices.size() * sizeof(Vertex);
-        glCreateBuffers(1, &vertex_buffer_object);
+        glCreateBuffers(1, &_vertex_buffer_object);
         // upload data to GPU buffer
-        glNamedBufferStorage(vertex_buffer_object, vertex_byte_count, vertices.data(), BufferStorageMask::GL_NONE_BIT);
+        glNamedBufferStorage(_vertex_buffer_object, vertex_byte_count, vertices.data(), BufferStorageMask::GL_NONE_BIT);
 
         // create indices
         std::vector<uint32_t> indices = {
@@ -115,43 +115,43 @@ struct Engine {
             16, 17, 19, 19, 18, 16, // top
             23, 21, 20, 23, 20, 22, // bottom
         };
-        index_count = indices.size();
+        _index_count = indices.size();
         // describe index buffer (element buffer)
         GLsizeiptr element_byte_count = vertices.size() * sizeof(Vertex);
-        glCreateBuffers(1, &element_buffer_object);
+        glCreateBuffers(1, &_element_buffer_object);
         // upload data to GPU buffer
-        glNamedBufferStorage(element_buffer_object, element_byte_count, indices.data(), BufferStorageMask::GL_NONE_BIT);
+        glNamedBufferStorage(_element_buffer_object, element_byte_count, indices.data(), BufferStorageMask::GL_NONE_BIT);
 
         // create vertex array buffer
-        glCreateVertexArrays(1, &vertex_array_object);
+        glCreateVertexArrays(1, &_vertex_array_object);
         // assign both vertex and index (element) buffers
-        glVertexArrayVertexBuffer(vertex_array_object, 0, vertex_buffer_object, 0, sizeof(Vertex));
-        glVertexArrayElementBuffer(vertex_array_object, element_buffer_object);
+        glVertexArrayVertexBuffer(_vertex_array_object, 0, _vertex_buffer_object, 0, sizeof(Vertex));
+        glVertexArrayElementBuffer(_vertex_array_object, _element_buffer_object);
         // specify vertex format with vertex array buffer
         // struct Vertex {
         //     glm::vec4 position; <---
         //     glm::vec4 color;
         // };
         // total size of 4 floats, starts at byte 0*GL_FLOAT
-        glVertexArrayAttribFormat(vertex_array_object, 0, 4, GL_FLOAT, GL_FALSE, 0 * sizeof(GL_FLOAT));
-        glVertexArrayAttribBinding(vertex_array_object, 0, 0);
-        glEnableVertexArrayAttrib(vertex_array_object, 0);
+        glVertexArrayAttribFormat(_vertex_array_object, 0, 4, GL_FLOAT, GL_FALSE, 0 * sizeof(GL_FLOAT));
+        glVertexArrayAttribBinding(_vertex_array_object, 0, 0);
+        glEnableVertexArrayAttrib(_vertex_array_object, 0);
         // struct Vertex {
         //     glm::vec4 position;
         //     glm::vec4 color; <---
         // };
         // total size of 4 floats, starts at byte 4*GL_FLOAT
-        glVertexArrayAttribFormat(vertex_array_object, 1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GL_FLOAT));
-        glVertexArrayAttribBinding(vertex_array_object, 1, 0);
-        glEnableVertexArrayAttrib(vertex_array_object, 1);
+        glVertexArrayAttribFormat(_vertex_array_object, 1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GL_FLOAT));
+        glVertexArrayAttribBinding(_vertex_array_object, 1, 0);
+        glEnableVertexArrayAttrib(_vertex_array_object, 1);
     }
     void destroy() {
         _window.destroy();
         // clean up
-        glDeleteBuffers(1, &vertex_buffer_object);
-        glDeleteBuffers(1, &element_buffer_object);
-        glDeleteVertexArrays(1, &vertex_array_object);
-        glDeleteProgram(shader_program);
+        glDeleteBuffers(1, &_vertex_buffer_object);
+        glDeleteBuffers(1, &_element_buffer_object);
+        glDeleteVertexArrays(1, &_vertex_array_object);
+        glDeleteProgram(_shader_program);
     }
     auto execute_event(SDL_Event* event_p) -> SDL_AppResult {
         // let input system process event
@@ -163,29 +163,24 @@ struct Engine {
         return SDL_AppResult::SDL_APP_CONTINUE;   
     }
     void execute_frame() {
-        // draw
-        if (Keys::down('w')) _transform.position.y += 0.01f;
-        if (Keys::down('s')) _transform.position.y -= 0.01f;
-        if (Keys::down('d')) _transform.position.x += 0.01f;
-        if (Keys::down('a')) _transform.position.x -= 0.01f;
-        if (Keys::down('q')) _transform.rotation += 0.01f;
-        if (Keys::down('e')) _transform.rotation -= 0.01f;
-        if (Mouse::down(Mouse::ids::left)) _transform.scale += 0.01f;
-        if (Mouse::down(Mouse::ids::right)) _transform.scale -= 0.01f;
+        // clear screen before drawing
         glClearColor(0.1, 0.1, 0.1, 0.0); // theoretically only needs to be set once
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shader_program);
+        // bind pipeline and draw geometry
+        glUseProgram(_shader_program);
+        _transform.rotation += 0.01f;
         _transform.bind();
-        glBindVertexArray(vertex_array_object);
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(_vertex_array_object);
+        glDrawElements(GL_TRIANGLES, _index_count, GL_UNSIGNED_INT, nullptr);
+        // present to the screen
         SDL_GL_SwapWindow(_window._window_p);
     }
 
     Window _window;
     Transform _transform;
-    GLuint shader_program;
-    GLuint vertex_buffer_object;
-    GLuint element_buffer_object;
-    GLuint vertex_array_object;
-    GLuint index_count;
+    GLuint _shader_program;
+    GLuint _vertex_buffer_object;
+    GLuint _element_buffer_object;
+    GLuint _vertex_array_object;
+    GLuint _index_count;
 };

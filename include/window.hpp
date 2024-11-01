@@ -29,7 +29,7 @@ struct Window {
         if (_context == nullptr) fmt::println("{}", SDL_GetError());
 
         // lazy loader for OpenGL functions
-        glbinding::initialize(SDL_GL_GetProcAddress, true);
+        glbinding::initialize(SDL_GL_GetProcAddress);
         // enable error logging
         glbinding::setCallbackMaskExcept(glbinding::CallbackMask::After | glbinding::CallbackMask::ParametersAndReturnValue, { "glGetError" });
         glbinding::setAfterCallback([](const glbinding::FunctionCall& call) {
@@ -70,7 +70,7 @@ struct Window {
             }
         });
 
-        glEnable(GL_CULL_FACE); // cull backfaces
+        // glEnable(GL_CULL_FACE); // cull backfaces
         glEnable(GL_DEPTH_TEST); // enable depth buffer and depth testing
         // glEnable(GL_FRAMEBUFFER_SRGB); // gamma corrected framebuffer
     }
