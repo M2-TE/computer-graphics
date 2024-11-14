@@ -23,6 +23,5 @@ void main() {
     
     // only rotate the normal
     out_norm = normalize(mat3x3(model_transform) * in_norm);
-    out_norm = in_norm; // DEBUG
     out_uv = in_uv;
 }

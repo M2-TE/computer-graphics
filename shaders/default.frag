@@ -10,6 +10,8 @@ layout (location = 0) out vec4 out_color;
 layout (binding = 0) uniform sampler2D tex_diffuse;
 // uniform buffers
 layout (location = 12) uniform vec3 camera_pos;
+layout (location = 13) uniform float specular = 1.0;
+layout (location = 14) uniform float specular_shininess = 16.0;
 
 void main() {
     // create "sun"
@@ -29,9 +31,10 @@ void main() {
     // specular color (reflected directly to camera)
     vec3 camera_dir = normalize(camera_pos - in_pos); // unit vector from camera to fragment/pixel
     vec3 reflected_dir = reflect(-light_dir, in_norm);
-    float specular_strength = 1.0;
-    float specular_shininess = 16.0;
-    specular_strength *= pow(max(dot(camera_dir, reflected_dir), 0.0), specular_shininess);
+    float specular_strength = dot(camera_dir, reflected_dir);
+    specular_strength = max(specular_strength, 0.0); // no negative specular light
+    specular_strength = pow(specular_strength, specular_shininess);
+    specular_strength = specular_strength * specular;
     vec3 specular_col = light_col * specular_strength;
 
     // final color

@@ -41,6 +41,7 @@ struct Engine {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // bind pipeline and draw geometry
         _pipeline.bind();
+        _transform._rotation += 0.01f;
         _transform.bind();
         // move camera
         float speed = 0.1f;
