@@ -12,11 +12,11 @@
 
 struct Engine {
     void init() {
-        _window.init(720, 720, "OpenGL Renderer");
+        _window.init(1280, 720, "OpenGL Renderer");
         _pipeline.init("../shaders/default.vert", "../shaders/default.frag");
         _mesh.init();
         _transform._position.z -= 5.0f;
-        _camera.set_perspective(720, 720, 70);
+        _camera.set_perspective(1280, 720, 70);
         _texture.init("../textures/grass.png");
         SDL_SetWindowRelativeMouseMode(_window._window_p, true);
     }

@@ -7,10 +7,10 @@ using namespace gl46core;
 
 struct Camera {
     void set_perspective(float width, float height, float fov) {
-        _projection_mat = glm::perspectiveFov(fov, width, height, nearPlane, farPlane);
+        _projection_mat = glm::perspectiveFov(fov, width, height, _near_plane, _far_plane);
     }
     void set_orthographic() {
-        _projection_mat = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+        _projection_mat = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, _near_plane, _far_plane);
     }
 
     // translate relative to camera direction
@@ -26,11 +26,12 @@ struct Camera {
         // upload to GPU
         glUniformMatrix4fv(4, 1, false, glm::value_ptr(view_mat));
         glUniformMatrix4fv(8, 1, false, glm::value_ptr(_projection_mat));
+        glUniform3f(12, _position.x, _position.y, _position.z);
     }
 
     glm::mat4x4 _projection_mat;
     glm::vec3 _position;
     glm::vec3 _rotation; // euler _rotation
-    float nearPlane = 0.1f;
-    float farPlane = 100.0f;
+    float _near_plane = 0.1f;
+    float _far_plane = 100.0f;
 };

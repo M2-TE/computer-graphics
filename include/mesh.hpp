@@ -11,34 +11,35 @@ struct Mesh {
             glm::vec4 position;
             glm::vec4 color;
             glm::vec2 uv;
+            glm::vec3 normal;
         };
         float n = -0.5f; // for readability
         float p = 0.5f; // for readability
         std::vector<Vertex> vertices = {
-            {{n, n, p, 1}, {1, 0, 0, 1}, {0.33, 0.75}}, // front
-            {{p, n, p, 1}, {1, 0, 0, 1}, {0.66, 0.75}},
-            {{n, p, p, 1}, {1, 0, 0, 1}, {0.33, 0.50}},
-            {{p, p, p, 1}, {1, 0, 0, 1}, {0.66, 0.50}},
-            {{n, n, n, 1}, {1, 0, 0, 1}, {0.33, 0.00}}, // back
-            {{p, n, n, 1}, {1, 0, 0, 1}, {0.66, 0.00}},
-            {{n, p, n, 1}, {1, 0, 0, 1}, {0.33, 0.25}},
-            {{p, p, n, 1}, {1, 0, 0, 1}, {0.66, 0.25}},
-            {{n, n, n, 1}, {0, 1, 0, 1}, {0.00, 0.50}}, // left
-            {{n, n, p, 1}, {0, 1, 0, 1}, {0.00, 0.25}},
-            {{n, p, n, 1}, {0, 1, 0, 1}, {0.33, 0.50}},
-            {{n, p, p, 1}, {0, 1, 0, 1}, {0.33, 0.25}},
-            {{p, n, n, 1}, {0, 1, 0, 1}, {1.00, 0.50}}, // right
-            {{p, n, p, 1}, {0, 1, 0, 1}, {1.00, 0.25}},
-            {{p, p, n, 1}, {0, 1, 0, 1}, {0.66, 0.50}},
-            {{p, p, p, 1}, {0, 1, 0, 1}, {0.66, 0.25}},
-            {{n, p, n, 1}, {0, 0, 1, 1}, {0.33, 0.25}}, // top
-            {{n, p, p, 1}, {0, 0, 1, 1}, {0.33, 0.50}},
-            {{p, p, n, 1}, {0, 0, 1, 1}, {0.66, 0.25}},
-            {{p, p, p, 1}, {0, 0, 1, 1}, {0.66, 0.50}},
-            {{n, n, n, 1}, {0, 0, 1, 1}, {0.33, 0.75}}, // bottom
-            {{n, n, p, 1}, {0, 0, 1, 1}, {0.33, 1.00}},
-            {{p, n, n, 1}, {0, 0, 1, 1}, {0.66, 0.75}},
-            {{p, n, p, 1}, {0, 0, 1, 1}, {0.66, 1.00}},
+            {{n, n, p, 1}, {1, 0, 0, 1}, {0.33, 0.75}, {0, 0, +1}}, // front
+            {{p, n, p, 1}, {1, 0, 0, 1}, {0.66, 0.75}, {0, 0, +1}},
+            {{n, p, p, 1}, {1, 0, 0, 1}, {0.33, 0.50}, {0, 0, +1}},
+            {{p, p, p, 1}, {1, 0, 0, 1}, {0.66, 0.50}, {0, 0, +1}},
+            {{n, n, n, 1}, {1, 0, 0, 1}, {0.33, 0.00}, {0, 0, -1}}, // back
+            {{p, n, n, 1}, {1, 0, 0, 1}, {0.66, 0.00}, {0, 0, -1}},
+            {{n, p, n, 1}, {1, 0, 0, 1}, {0.33, 0.25}, {0, 0, -1}},
+            {{p, p, n, 1}, {1, 0, 0, 1}, {0.66, 0.25}, {0, 0, -1}},
+            {{n, n, n, 1}, {0, 1, 0, 1}, {0.00, 0.50}, {-1, 0, 0}}, // left
+            {{n, n, p, 1}, {0, 1, 0, 1}, {0.00, 0.25}, {-1, 0, 0}},
+            {{n, p, n, 1}, {0, 1, 0, 1}, {0.33, 0.50}, {-1, 0, 0}},
+            {{n, p, p, 1}, {0, 1, 0, 1}, {0.33, 0.25}, {-1, 0, 0}},
+            {{p, n, n, 1}, {0, 1, 0, 1}, {1.00, 0.50}, {+1, 0, 0}}, // right
+            {{p, n, p, 1}, {0, 1, 0, 1}, {1.00, 0.25}, {+1, 0, 0}},
+            {{p, p, n, 1}, {0, 1, 0, 1}, {0.66, 0.50}, {+1, 0, 0}},
+            {{p, p, p, 1}, {0, 1, 0, 1}, {0.66, 0.25}, {+1, 0, 0}},
+            {{n, p, n, 1}, {0, 0, 1, 1}, {0.33, 0.25}, {0, +1, 0}}, // top
+            {{n, p, p, 1}, {0, 0, 1, 1}, {0.33, 0.50}, {0, +1, 0}},
+            {{p, p, n, 1}, {0, 0, 1, 1}, {0.66, 0.25}, {0, +1, 0}},
+            {{p, p, p, 1}, {0, 0, 1, 1}, {0.66, 0.50}, {0, +1, 0}},
+            {{n, n, n, 1}, {0, 0, 1, 1}, {0.33, 0.75}, {0, -1, 0}}, // bottom
+            {{n, n, p, 1}, {0, 0, 1, 1}, {0.33, 1.00}, {0, -1, 0}},
+            {{p, n, n, 1}, {0, 0, 1, 1}, {0.66, 0.75}, {0, -1, 0}},
+            {{p, n, p, 1}, {0, 0, 1, 1}, {0.66, 1.00}, {0, -1, 0}},
         };
         
         // describe vertex buffer
@@ -72,6 +73,7 @@ struct Mesh {
         //     glm::vec4 position; <---
         //     glm::vec4 color;
         //     glm::vec2 uv;
+        //     glm::vec3 normal;
         // };
         // total size of 4 floats, starts at byte 0*GL_FLOAT
         glVertexArrayAttribFormat(_vertex_array_object, 0, 4, GL_FLOAT, GL_FALSE, 0 * sizeof(GL_FLOAT));
@@ -81,6 +83,7 @@ struct Mesh {
         //     glm::vec4 position;
         //     glm::vec4 color; <---
         //     glm::vec2 uv;
+        //     glm::vec3 normal;
         // };
         // total size of 4 floats, starts at byte 4*GL_FLOAT
         glVertexArrayAttribFormat(_vertex_array_object, 1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GL_FLOAT));
@@ -90,11 +93,23 @@ struct Mesh {
         //     glm::vec4 position;
         //     glm::vec4 color;
         //     glm::vec2 uv; <---
+        //     glm::vec3 normal;
         // };
         // total size of 2 floats, starts at byte 8*GL_FLOAT
         glVertexArrayAttribFormat(_vertex_array_object, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT));
         glVertexArrayAttribBinding(_vertex_array_object, 2, 0);
         glEnableVertexArrayAttrib(_vertex_array_object, 2);
+
+        // struct Vertex {
+        //     glm::vec4 position;
+        //     glm::vec4 color;
+        //     glm::vec2 uv;
+        //     glm::vec3 normal; <---
+        // };
+        // total size of 3 floats, starts at byte 10*GL_FLOAT
+        glVertexArrayAttribFormat(_vertex_array_object, 3, 3, GL_FLOAT, GL_FALSE, 10 * sizeof(GL_FLOAT));
+        glVertexArrayAttribBinding(_vertex_array_object, 3, 0);
+        glEnableVertexArrayAttrib(_vertex_array_object, 3);
     }
     // clean up mesh buffers
     void destroy() {
