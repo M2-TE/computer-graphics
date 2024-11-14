@@ -18,16 +18,24 @@ struct Engine {
         _window.init(1280, 720, "OpenGL Renderer");
         _pipeline.init("../shaders/default.vert", "../shaders/default.frag");
         _mesh.init();
-        _transform._position.z -= 5.0f;
+        _transform._position = glm::vec3(-3, 0, -5);
         _camera.set_perspective(1280, 720, 70);
         _texture.init("../textures/grass.png");
         SDL_SetWindowRelativeMouseMode(_window._window_p, true);
+
+
+        _pipeline_vertcol.init("../shaders/vertcol.vert", "../shaders/vertcol.frag");
+        _mesh_vertcol.init();
+        _transform_vertcol._position = glm::vec3(3, 0, -5);
         
         ImGui::CreateContext();
         ImGui_ImplSDL3_InitForOpenGL(_window._window_p, _window._context);
         ImGui_ImplOpenGL3_Init();
     }
     void destroy() {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplSDL3_Shutdown();
+        ImGui::DestroyContext();
         _window.destroy();
         _pipeline.destroy();
         _mesh.destroy();
@@ -74,6 +82,11 @@ struct Engine {
         // bind and draw mesh
         _texture.bind();
         _mesh.draw();
+        // draw second mesh
+        _pipeline_vertcol.bind();
+        _transform_vertcol.bind();
+        _camera.bind();
+        _mesh_vertcol.draw();
         // present to the screen
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -87,4 +100,8 @@ struct Engine {
     Transform _transform;
     Texture _texture;
     Mesh _mesh;
+    // second cube:
+    Transform _transform_vertcol;
+    Pipeline _pipeline_vertcol;
+    Mesh _mesh_vertcol;
 };
