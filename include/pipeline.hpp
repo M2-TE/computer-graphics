@@ -6,9 +6,9 @@ using namespace gl46core;
 
 struct Pipeline {
     // compile shaders and link shader program
-    void init() {
+    void init(const char* vs_path, const char* fs_path) {
         // read vertex shader data
-        std::ifstream vs_file("../shaders/default.vert", std::ios::binary);
+        std::ifstream vs_file(vs_path, std::ios::binary);
         vs_file.seekg(0, std::ios::end);
         GLint vs_size = vs_file.tellg();
         vs_file.seekg(0, std::ios::beg);
@@ -29,7 +29,7 @@ struct Pipeline {
         }
 
         // read fragment shader data
-        std::ifstream fs_file("../shaders/default.frag", std::ios::binary);
+        std::ifstream fs_file(fs_path, std::ios::binary);
         fs_file.seekg(0, std::ios::end);
         GLint fs_size = fs_file.tellg();
         fs_file.seekg(0, std::ios::beg);

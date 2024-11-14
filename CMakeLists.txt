@@ -9,7 +9,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 17)
 
 # create renderer executable
-add_executable(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+add_executable(${PROJECT_NAME}
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/stb.cpp")
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_DL_LIBS}) # fix windows DLL nightmares
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -25,3 +27,4 @@ include(sdl)
 include(opengl)
 include(fmt)
 include(glm)
+include(stb)

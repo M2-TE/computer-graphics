@@ -1,7 +1,6 @@
 #pragma once
 #include <glbinding/gl46core/gl.h>
 using namespace gl46core;
-
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,7 +15,7 @@ struct Transform {
         transform_matrix = glm::rotate(transform_matrix, _rotation.y, glm::vec3(0, 1, 0));
         transform_matrix = glm::rotate(transform_matrix, _rotation.z, glm::vec3(0, 0, 1));
         transform_matrix = glm::scale(transform_matrix, _scale);
-
+        // upload to GPU
         glUniformMatrix4fv(0, 1, false, glm::value_ptr(transform_matrix));
     }
 
