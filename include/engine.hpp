@@ -2,6 +2,9 @@
 #include <SDL3/SDL_init.h>
 #include <glm/glm.hpp>
 #include <fmt/base.h>
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_opengl3.h>
 #include "window.hpp"
 #include "input.hpp"
 #include "mesh.hpp"
@@ -19,6 +22,10 @@ struct Engine {
         _camera.set_perspective(1280, 720, 70);
         _texture.init("../textures/grass.png");
         SDL_SetWindowRelativeMouseMode(_window._window_p, true);
+        
+        ImGui::CreateContext();
+        ImGui_ImplSDL3_InitForOpenGL(_window._window_p, _window._context);
+        ImGui_ImplOpenGL3_Init();
     }
     void destroy() {
         _window.destroy();
@@ -36,12 +43,21 @@ struct Engine {
         return SDL_AppResult::SDL_APP_CONTINUE;   
     }
     void execute_frame() {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui::NewFrame();
+
+        // draw some ui
+        ImGui::Begin("FPS window");
+        ImGui::Text("%.1f fps", ImGui::GetIO().Framerate);
+        ImGui::End();
+
         // clear screen before drawing
         glClearColor(0.1, 0.1, 0.1, 0.0); // theoretically only needs to be set once
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // bind pipeline and draw geometry
         _pipeline.bind();
-        _transform._rotation += 0.01f;
+        // _transform._rotation += 0.01f;
         _transform.bind();
         // move camera
         float speed = 0.1f;
@@ -59,6 +75,8 @@ struct Engine {
         _texture.bind();
         _mesh.draw();
         // present to the screen
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(_window._window_p);
         Input::flush();
     }
