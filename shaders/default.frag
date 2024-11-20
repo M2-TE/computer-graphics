@@ -3,15 +3,18 @@
 // interpolated input from vertex shader
 layout (location = 0) in vec3 in_pos;
 layout (location = 1) in vec3 in_norm;
-layout (location = 2) in vec2 in_uv;
+layout (location = 2) in vec4 in_col;
+layout (location = 3) in vec2 in_uv;
+
 // final pixel/fragment color
 layout (location = 0) out vec4 out_color;
 // texture unit
 layout (binding = 0) uniform sampler2D tex_diffuse;
 // uniform buffers
-layout (location = 12) uniform vec3 camera_pos;
-layout (location = 13) uniform float specular = 1.0;
-layout (location = 14) uniform float specular_shininess = 128.0;
+layout (location = 16) uniform vec3 camera_pos;
+layout (location = 17) uniform bool has_texture;
+layout (location = 18) uniform float specular = 1.0;
+layout (location = 19) uniform float specular_shininess = 128.0;
 
 void main() { // blinn-phong shading
     // create "sun"
@@ -29,16 +32,20 @@ void main() { // blinn-phong shading
     vec3 diffuse_col = light_col * diffuse_strength;
 
     // specular color (reflected directly to camera)
-    vec3 camera_dir = normalize(camera_pos - in_pos); // unit vector from camera to fragment/pixel
-    vec3 reflected_dir = reflect(-light_dir, in_norm);
+    vec3 camera_dir = normalize(in_pos - camera_pos); // unit vector from camera to fragment/pixel
+    vec3 reflected_dir = reflect(light_dir, in_norm);
     float specular_strength = dot(camera_dir, reflected_dir);
-    specular_strength = max(specular_strength, 0.0); // no negative specular light
+    specular_strength = max(specular_strength, 0.0); // filter out "negative" strength
     specular_strength = pow(specular_strength, specular_shininess);
     specular_strength = specular_strength * specular;
     vec3 specular_col = light_col * specular_strength;
 
     // final color
-    vec3 color = texture(tex_diffuse, in_uv).rgb;
-    color = color * (ambient_col + diffuse_col + specular_col); // combine light-affected colors
-    out_color = vec4(color, 1.0);
+    if (has_texture) {
+        out_color = texture(tex_diffuse, in_uv);
+    }
+    else {
+        out_color = in_col;
+    }
+    out_color.rgb = out_color.rgb * (ambient_col + diffuse_col + specular_col); // combine light-affected colors
 }

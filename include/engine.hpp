@@ -8,26 +8,24 @@
 #include "time.hpp"
 #include "window.hpp"
 #include "input.hpp"
-#include "mesh.hpp"
 #include "pipeline.hpp"
-#include "transform.hpp"
-#include "texture.hpp"
-#include "camera.hpp"
+#include "entities/camera.hpp"
+#include "entities/model.hpp"
+#include "entities/light.hpp"
 
 struct Engine {
     void init() {
         Time::init();
         _window.init(1280, 720, "OpenGL Renderer");
-        _pipeline.init("../shaders/default.vert", "../shaders/default.frag");
-        _mesh.init();
-        _transform._position = glm::vec3(-3, 0, -5);
         _camera.set_perspective(1280, 720, 70);
-        _texture.init("../textures/grass.png");
-
-        _pipeline_vertcol.init("../shaders/vertcol.vert", "../shaders/vertcol.frag");
-        _mesh_vertcol.init();
-        _transform_vertcol._position = glm::vec3(3, 0, -5);
-        
+        // create pipeline for textured objects
+        _pipeline.init("../shaders/default.vert", "../shaders/default.frag");
+        // create the two cubes
+        _cube_a.init("../textures/grass.png");
+        _cube_a._transform._position = glm::vec3(-3, 0, -5);
+        _cube_b.init();
+        _cube_b._transform._position = glm::vec3(+3, 0, -5);
+        // initialize ImGui for UI rendering
         ImGui::CreateContext();
         ImGui_ImplSDL3_InitForOpenGL(_window._window_p, _window._context);
         ImGui_ImplOpenGL3_Init();
@@ -36,10 +34,8 @@ struct Engine {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplSDL3_Shutdown();
         ImGui::DestroyContext();
-        _window.destroy();
         _pipeline.destroy();
-        _mesh.destroy();
-        _texture.destroy();
+        _window.destroy();
     }
     auto execute_event(SDL_Event* event_p) -> SDL_AppResult {
         // pass event over to imgui as well
@@ -79,7 +75,7 @@ struct Engine {
         }
     }
     void execute_frame() {
-        // update timer
+        // update timer for accurate Time::get_delta()
         Time::update();
         // start new imgui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -88,26 +84,21 @@ struct Engine {
 
         // draw some ui
         ImGui::Begin("FPS window");
-        ImGui::Text("%.1f fps, %.3f ms", ImGui::GetIO().Framerate, Time::get_delta() * 1000.0);
+        ImGui::Text("%.1f fps, %.2f ms", ImGui::GetIO().Framerate, Time::get_delta() * 1000.0);
         ImGui::End();
 
         // handle all the inputs such as camera movement
         execute_input();
 
         // clear screen before drawing
-        glClearColor(0.1, 0.1, 0.1, 0.0); // theoretically only needs to be set once
+        glClearColor(0.1, 0.1, 0.1, 0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // bind pipeline and draw geometry
         _pipeline.bind();
-        _transform.bind();
         _camera.bind();
-        _texture.bind();
-        _mesh.draw();
-        // draw second mesh
-        _pipeline_vertcol.bind();
-        _transform_vertcol.bind();
-        _camera.bind();
-        _mesh_vertcol.draw();
+        _cube_a._transform._rotation += Time::get_delta();
+        _cube_a.draw();
+        _cube_b.draw();
         // present to the screen
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -116,15 +107,11 @@ struct Engine {
     }
 
     Window _window;
-    Pipeline _pipeline;
     Camera _camera;
-    Transform _transform;
-    Texture _texture;
-    Mesh _mesh;
-    // second cube:
-    Transform _transform_vertcol;
+    Pipeline _pipeline;
     Pipeline _pipeline_vertcol;
-    Mesh _mesh_vertcol;
+    Model _cube_a;
+    Model _cube_b;
     // other
     bool _mouse_captured = false;
 };
