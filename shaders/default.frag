@@ -11,9 +11,9 @@ layout (binding = 0) uniform sampler2D tex_diffuse;
 // uniform buffers
 layout (location = 12) uniform vec3 camera_pos;
 layout (location = 13) uniform float specular = 1.0;
-layout (location = 14) uniform float specular_shininess = 16.0;
+layout (location = 14) uniform float specular_shininess = 128.0;
 
-void main() {
+void main() { // blinn-phong shading
     // create "sun"
     vec3 light_pos = vec3(1.0, 2.0, -3.5);
     vec3 light_col = vec3(.992, .984, .827);
