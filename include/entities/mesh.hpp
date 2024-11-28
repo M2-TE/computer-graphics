@@ -5,17 +5,19 @@
 using namespace gl46core;
 
 struct Mesh {
-    // create mesh data (vertices, indices/elements, vertex arrays)
+    enum Primitive { eCube, eSphere };
+    struct Vertex {
+        glm::vec3 position;
+        glm::vec3 normal;
+        glm::vec4 color;
+        glm::vec2 uv;
+    };
+
+    // load cube primitive
     void init() {
         // create vertices
-        struct Vertex {
-            glm::vec3 position;
-            glm::vec3 normal;
-            glm::vec4 color;
-            glm::vec2 uv;
-        };
         float n = -0.5f; // for readability
-        float p = 0.5f; // for readability
+        float p = +0.5f; // for readability
         std::vector<Vertex> vertices = {
             {{n, n, p}, {0, 0, +1}, {1, 0, 0, 1}, {0.33, 0.75}}, // front
             {{p, n, p}, {0, 0, +1}, {1, 0, 0, 1}, {0.66, 0.75}},
@@ -42,12 +44,6 @@ struct Mesh {
             {{p, n, n}, {0, -1, 0}, {0, 0, 1, 1}, {0.66, 0.75}},
             {{p, n, p}, {0, -1, 0}, {0, 0, 1, 1}, {0.66, 1.00}},
         };
-        
-        // describe vertex buffer
-        GLsizeiptr vertex_byte_count = vertices.size() * sizeof(Vertex);
-        glCreateBuffers(1, &_vertex_buffer_object);
-        // upload data to GPU buffer
-        glNamedBufferStorage(_vertex_buffer_object, vertex_byte_count, vertices.data(), BufferStorageMask::GL_NONE_BIT);
 
         // create indices
         std::vector<uint32_t> indices = {
@@ -58,7 +54,82 @@ struct Mesh {
             16, 17, 19, 19, 18, 16, // top
             23, 21, 20, 23, 20, 22, // bottom
         };
+        describe_layout(vertices, indices);
+    }
+    // load sphere primitive
+    void init(uint32_t sector_count, uint32_t stack_count) {
+        // https://www.songho.ca/opengl/gl_sphere.html
+        float pi = 3.14159265358979323846f;
+        float radius = 0.5f;
+        // precalc expensive operations
+        float length_recip = 1.0f / radius;
+        float sector_step = 2.0f * pi / static_cast<float>(sector_count);
+        float stack_step = pi / static_cast<float>(stack_count);
+
+        // preallocate some space for vertices
+        std::vector<Vertex> vertices;
+        vertices.reserve((sector_count + 1) * (stack_count + 1));
+
+        // create vertices
+        for (uint32_t i = 0; i <= stack_count; i++) {
+            float stack_angle = pi / 2.0f - static_cast<float>(i) * stack_step;
+            float xy = radius * std::cos(stack_angle);
+            float z = radius * std::sin(stack_angle);
+
+            for (uint32_t k = 0; k <= sector_count; k++) {
+                Vertex& vertex = vertices.emplace_back();
+
+                // calculate position
+                float sector_angle = static_cast<float>(k) * sector_step;
+                vertex.position.x = xy * std::cos(sector_angle);
+                vertex.position.y = xy * std::sin(sector_angle);
+                vertex.position.z = z;
+
+                // calculate normal
+                vertex.normal = vertex.position * length_recip;
+
+                // calculate uv/st coordinates
+                // vertex.st.s = static_cast<float>(k) / sector_count;
+                // vertex.st.t = static_cast<float>(i) / stack_count;
+                vertex.color = glm::vec4(1, 1, 1, 1);
+            }
+        }
+
+        // create indices
+        // k1--k1+1
+        // |  / |
+        // | /  |
+        // k2--k2+1
+        std::vector<uint32_t> indices;
+        for (uint32_t i = 0; i < stack_count; i++) {
+            uint32_t k1 = i * (sector_count + 1); // beginning of current stack
+            uint32_t k2 = k1 + sector_count + 1;  // beginning of next stack
+
+            for (uint32_t j = 0; j < (uint32_t)sector_count; j++, k1++, k2++) {
+                // 2 triangles per sector excluding first and last stacks
+                if (i != 0) {
+                    indices.insert(indices.end(), {
+                        k1, k2, k1 + 1
+                    });
+                }
+                if (i != stack_count - 1) {
+                    indices.insert(indices.end(), {
+                        k1 + 1, k2, k2 + 1
+                    });
+                }
+            }
+        }
+        describe_layout(vertices, indices);
+    }
+    // describe memory layout
+    void describe_layout(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
         _index_count = indices.size();
+        // describe vertex buffer
+        GLsizeiptr vertex_byte_count = vertices.size() * sizeof(Vertex);
+        glCreateBuffers(1, &_vertex_buffer_object);
+        // upload data to GPU buffer
+        glNamedBufferStorage(_vertex_buffer_object, vertex_byte_count, vertices.data(), BufferStorageMask::GL_NONE_BIT);
+
         // describe index buffer (element buffer)
         GLsizeiptr element_byte_count = vertices.size() * sizeof(Vertex);
         glCreateBuffers(1, &_element_buffer_object);
