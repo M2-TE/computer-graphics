@@ -95,9 +95,10 @@ struct Model {
         }
     }
 
-    void draw() {
+    void draw(bool color = true) {
         _transform.bind();
         for (uint32_t i = 0; i < _meshes.size(); i++) {
+            // only bind textures and materials if color is drawn
             uint32_t material_index = _meshes[i]._material_index;
             if (material_index < _textures.size()) {
                 _textures[material_index].bind();
