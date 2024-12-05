@@ -96,6 +96,10 @@ struct Engine {
             _mouse_captured = true;
             SDL_SetWindowRelativeMouseMode(_window._window_p, _mouse_captured);
         }
+
+        // draw wireframe while holding spacebar
+        if (Keys::down(SDLK_SPACE)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     void execute_frame() {
         // update timer for accurate Time::get_delta()
