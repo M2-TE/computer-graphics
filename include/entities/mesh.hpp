@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm/glm.hpp>
+#include <assimp/mesh.h>
 #include <glbinding/gl46core/gl.h>
 using namespace gl46core;
 
@@ -121,9 +122,51 @@ struct Mesh {
         }
         describe_layout(vertices, indices);
     }
+    // load mesh from assimp scene
+    void init(aiMesh* mesh_p) {
+        std::vector<Vertex> vertices;
+        vertices.reserve(mesh_p->mNumVertices);
+        for (uint32_t i = 0; i < mesh_p->mNumVertices; i++) {
+            Vertex vertex;
+            // extract positions
+            vertex.position.x = mesh_p->mVertices[i].x;
+            vertex.position.y = mesh_p->mVertices[i].y;
+            vertex.position.z = mesh_p->mVertices[i].z;
+            // extract normals
+            vertex.normal.x = mesh_p->mNormals[i].x;
+            vertex.normal.y = mesh_p->mNormals[i].y;
+            vertex.normal.z = mesh_p->mNormals[i].z;
+            // extract uv/st coords
+            if (mesh_p->HasTextureCoords(0)) {
+                vertex.uv.s = mesh_p->mTextureCoords[0][i].x;
+                vertex.uv.t = mesh_p->mTextureCoords[0][i].y;
+            }
+            // extract vertex colors (if present)
+            if (mesh_p->HasVertexColors(0)) {
+                vertex.color.r = mesh_p->mColors[0][i].r;
+                vertex.color.g = mesh_p->mColors[0][i].g;
+                vertex.color.b = mesh_p->mColors[0][i].b;
+                vertex.color.a = mesh_p->mColors[0][i].a;
+            }
+            vertices.push_back(vertex);
+        }
+
+        std::vector<uint32_t> indices;
+        indices.reserve(mesh_p->mNumFaces * 3);
+        for (int i = 0; i < mesh_p->mNumFaces; i++) {
+            aiFace face = mesh_p->mFaces[i];
+            assert(face.mNumIndices == 3);
+            for (int j = 0; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
+            }
+        }
+        _material_index = mesh_p->mMaterialIndex;
+        describe_layout(vertices, indices);
+    }
     // describe memory layout
     void describe_layout(std::vector<Vertex>& vertices, std::vector<uint32_t>& indices) {
         _index_count = indices.size();
+
         // describe vertex buffer
         GLsizeiptr vertex_byte_count = vertices.size() * sizeof(Vertex);
         glCreateBuffers(1, &_vertex_buffer_object);
@@ -131,7 +174,7 @@ struct Mesh {
         glNamedBufferStorage(_vertex_buffer_object, vertex_byte_count, vertices.data(), BufferStorageMask::GL_NONE_BIT);
 
         // describe index buffer (element buffer)
-        GLsizeiptr element_byte_count = vertices.size() * sizeof(Vertex);
+        GLsizeiptr element_byte_count = indices.size() * sizeof(uint32_t);
         glCreateBuffers(1, &_element_buffer_object);
         // upload data to GPU buffer
         glNamedBufferStorage(_element_buffer_object, element_byte_count, indices.data(), BufferStorageMask::GL_NONE_BIT);
@@ -198,4 +241,5 @@ struct Mesh {
     GLuint _element_buffer_object;
     GLuint _vertex_array_object;
     GLsizei _index_count;
+    uint32_t _material_index = 0;
 };

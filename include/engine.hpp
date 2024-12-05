@@ -22,10 +22,12 @@ struct Engine {
         // create pipeline for textured objects
         _pipeline.init("../shaders/default.vert", "../shaders/default.frag");
         // create the two cubes
-        _cube.init("../textures/grass.png");
+        _cube.init(Mesh::eCube, "../textures/grass.png");
         _cube._transform._position = glm::vec3(-3, 0, -5);
         _sphere.init(Mesh::eSphere);
         _sphere._transform._position = glm::vec3(+3, 0, -5);
+        _sponza.init("../models/sponza/sponza.obj");
+        _sponza._transform._scale = glm::vec3(.01, .01, .01);
         // initialize ImGui for UI rendering
         ImGui::CreateContext();
         ImGui_ImplSDL3_InitForOpenGL(_window._window_p, _window._context);
@@ -88,12 +90,6 @@ struct Engine {
         ImGui::Text("%.1f fps, %.2f ms", ImGui::GetIO().Framerate, Time::get_delta() * 1000.0);
         ImGui::End();
 
-        // material slider for the colcube mat
-        ImGui::Begin("colcube specular");
-        ImGui::SliderFloat("specular", &_sphere._material._specular, 0.0f, 1.0f);
-        ImGui::SliderFloat("specular shininess", &_sphere._material._specular_shininess, 1.0f, 256.0f);
-        ImGui::End();
-
         // handle all the inputs such as camera movement
         execute_input();
 
@@ -106,6 +102,7 @@ struct Engine {
         _cube._transform._rotation += Time::get_delta();
         _cube.draw();
         _sphere.draw();
+        _sponza.draw();
         // present to the screen
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -119,6 +116,7 @@ struct Engine {
     Pipeline _pipeline_vertcol;
     Model _cube;
     Model _sphere;
+    Model _sponza;
     // other
     bool _mouse_captured = false;
 };

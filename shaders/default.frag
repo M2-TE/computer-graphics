@@ -14,7 +14,10 @@ layout (binding = 0) uniform sampler2D tex_diffuse;
 layout (location = 16) uniform vec3 camera_pos;
 layout (location = 17) uniform float texture_contribution;
 layout (location = 18) uniform float specular;
-layout (location = 19) uniform float specular_shininess ;
+layout (location = 19) uniform float specular_shininess;
+layout (location = 20) uniform vec3 mat_ambient = vec3(1, 1, 1); // TODO
+layout (location = 21) uniform vec3 mat_diffuse = vec3(1, 1, 1); // TODO
+layout (location = 22) uniform vec3 mat_specular = vec3(1, 1, 1); // TODO
 
 void main() { // blinn-phong shading
     // create "sun"
@@ -31,12 +34,12 @@ void main() { // blinn-phong shading
 
     // ambient color (low scattered indirect light)
     float ambient_strength = 0.1;
-    vec3 ambient_col = light_col * ambient_strength;
+    vec3 ambient_col = light_col * ambient_strength * mat_ambient;
 
     // direct light color
     float diffuse_strength = dot(in_norm, light_dir);
     diffuse_strength = max(diffuse_strength, 0.0); // filter out "negative" strength
-    vec3 diffuse_col = light_col * diffuse_strength * attenuation;
+    vec3 diffuse_col = light_col * diffuse_strength * attenuation * mat_diffuse;
 
     // specular color (reflected directly to camera)
     vec3 camera_dir = normalize(in_pos - camera_pos); // unit vector from camera to fragment/pixel
@@ -45,7 +48,7 @@ void main() { // blinn-phong shading
     specular_strength = max(specular_strength, 0.0); // filter out "negative" strength
     specular_strength = pow(specular_strength, specular_shininess);
     specular_strength = specular_strength * specular;
-    vec3 specular_col = light_col * specular_strength * attenuation;
+    vec3 specular_col = light_col * specular_strength * attenuation * mat_specular;
 
     // final color
     out_color = mix(in_col, texture(tex_diffuse, in_uv), texture_contribution);
