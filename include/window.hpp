@@ -8,7 +8,7 @@
 using namespace gl46core;
 
 struct Window {
-    void init(int width, int height, std::string name) {
+    void init(int width, int height, std::string name, int sample_count = 1) {
         // init the SDL video subsystem before anything else
         bool res = SDL_InitSubSystem(SDL_INIT_VIDEO);
         if (!res) fmt::println("{}", SDL_GetError());
@@ -19,6 +19,11 @@ struct Window {
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MINOR_VERSION, 6);
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_DOUBLEBUFFER, 1);
         SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_FLAGS, SDL_GLcontextFlag::SDL_GL_CONTEXT_DEBUG_FLAG);
+         // set up multisampling capabilities
+        if (sample_count > 1) {
+            SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLEBUFFERS, 1); // enable multisampling
+            SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLESAMPLES, sample_count); // set number of samples per pixel
+        }
 
         // create a window specifically with OpenGL support
         _window_p = SDL_CreateWindow(name.c_str(), width, height, SDL_WINDOW_OPENGL);
@@ -70,6 +75,12 @@ struct Window {
             }
         });
 
+        if (sample_count > 1) {
+            glEnable(GL_MULTISAMPLE);  // enable multisampling application-wide
+            glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE); // enable color blending via multisampling
+        }
+        glEnable(GL_BLEND); // color blending for proper transparency
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // define function for blending colors
         glEnable(GL_CULL_FACE); // cull backfaces
         glEnable(GL_DEPTH_TEST); // enable depth buffer and depth testing
         // glEnable(GL_FRAMEBUFFER_SRGB); // gamma corrected framebuffer

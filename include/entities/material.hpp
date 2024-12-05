@@ -10,5 +10,5 @@ struct Material {
 
     float _texture_contribution = 0;
     float _specular = 1;
-    float _specular_shininess = 128;
+    float _specular_shininess = 32;
 };

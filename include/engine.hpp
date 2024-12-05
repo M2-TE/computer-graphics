@@ -17,7 +17,7 @@ using namespace gl46core;
 struct Engine {
     void init() {
         Time::init();
-        _window.init(1280, 720, "OpenGL Renderer");
+        _window.init(1280, 720, "OpenGL Renderer", 4);
         _camera.set_perspective(1280, 720, 70);
         // create pipeline for textured objects
         _pipeline.init("../shaders/default.vert", "../shaders/default.frag");
