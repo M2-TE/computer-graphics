@@ -49,7 +49,7 @@ void main() { // blinn-phong shading
     float specular_strength = dot(camera_dir, reflected_dir);
     specular_strength = max(specular_strength, 0.0); // filter out "negative" strength
     specular_strength = pow(specular_strength, specular_shininess);
-    specular_strength = specular_strength * specular;
+    specular_strength = specular_strength * min(specular, 1.0);
     vec3 specular_col = light_col * specular_strength * attenuation * mat_specular;
 
     // calculate shadow depth via distance from pixel/fragment to light
