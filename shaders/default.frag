@@ -19,17 +19,17 @@ layout (location = 19) uniform float specular_shininess;
 layout (location = 20) uniform vec3 mat_ambient = vec3(1, 1, 1); // TODO
 layout (location = 21) uniform vec3 mat_diffuse = vec3(1, 1, 1); // TODO
 layout (location = 22) uniform vec3 mat_specular = vec3(1, 1, 1); // TODO
+layout (location = 23) uniform vec3 light_pos;
+layout (location = 24) uniform vec3 light_col;
+layout (location = 25) uniform float light_range;
 
 void main() { // blinn-phong shading
-    // create "sun"
-    vec3 light_pos = vec3(1.0, 3.0, -0.5);
-    vec3 light_col = vec3(.992, .984, .827);
     vec3 light_dir = normalize(light_pos - in_pos); // unit vector from light to fragment/pixel
-    float light_range = 100.0;
+    vec3 norm = normalize(in_norm);
 
     // calculate attenuation (point light)
     // see https://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation for constant linear/quad factors
-    float light_distance = length(light_dir);
+    float light_distance = length(light_pos - in_pos);
     float linear = light_distance * 0.14;
     float quadratic = light_distance * light_distance * 0.07;
     float attenuation = 1.0 / (1.0 + linear + quadratic);
@@ -39,13 +39,13 @@ void main() { // blinn-phong shading
     vec3 ambient_col = light_col * ambient_strength * mat_ambient;
 
     // direct light color
-    float diffuse_strength = dot(in_norm, light_dir);
+    float diffuse_strength = dot(norm, light_dir);
     diffuse_strength = max(diffuse_strength, 0.0); // filter out "negative" strength
     vec3 diffuse_col = light_col * diffuse_strength * attenuation * mat_diffuse;
 
     // specular color (reflected directly to camera)
     vec3 camera_dir = normalize(in_pos - camera_pos); // unit vector from camera to fragment/pixel
-    vec3 reflected_dir = reflect(light_dir, in_norm);
+    vec3 reflected_dir = reflect(light_dir, norm);
     float specular_strength = dot(camera_dir, reflected_dir);
     specular_strength = max(specular_strength, 0.0); // filter out "negative" strength
     specular_strength = pow(specular_strength, specular_shininess);
@@ -61,7 +61,7 @@ void main() { // blinn-phong shading
     // // use a bias to remedy sampling inaccuracies
     float bias_max = 1.0;
     float bias_min = 0.005;
-    float bias = max((1.0 - dot(in_norm, light_dir) * bias_max), bias_min); 
+    float bias = max((1.0 - dot(norm, light_dir) * bias_max), bias_min); 
     // // pixel is in shadow, if light did not see it
     // float light_contribution = 1.0;
     // if (depth_current - bias > depth_real) light_contribution = 0.0;

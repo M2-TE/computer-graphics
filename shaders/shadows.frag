@@ -13,11 +13,11 @@ layout (location = 19) uniform float specular_shininess;
 layout (location = 20) uniform vec3 mat_ambient = vec3(1, 1, 1); // TODO
 layout (location = 21) uniform vec3 mat_diffuse = vec3(1, 1, 1); // TODO
 layout (location = 22) uniform vec3 mat_specular = vec3(1, 1, 1); // TODO
+layout (location = 23) uniform vec3 light_pos;
+layout (location = 24) uniform vec3 light_col;
+layout (location = 25) uniform float light_range;
 
 void main() {
-    vec3 light_pos = vec3(1.0, 3.0, -0.5);
-    float light_range = 100.0;
-
     // do not write any color output, only depth
     vec3 fragment_to_light = in_pos - light_pos;
     float light_distance = length(fragment_to_light);

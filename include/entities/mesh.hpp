@@ -141,6 +141,7 @@ struct Mesh {
                 vertex.uv.s = mesh_p->mTextureCoords[0][i].x;
                 vertex.uv.t = mesh_p->mTextureCoords[0][i].y;
             }
+            else vertex.uv = {0, 0};
             // extract vertex colors (if present)
             if (mesh_p->HasVertexColors(0)) {
                 vertex.color.r = mesh_p->mColors[0][i].r;
@@ -148,6 +149,7 @@ struct Mesh {
                 vertex.color.b = mesh_p->mColors[0][i].b;
                 vertex.color.a = mesh_p->mColors[0][i].a;
             }
+            else vertex.color = {1, 1, 1, 1};
             vertices.push_back(vertex);
         }
 

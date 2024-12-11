@@ -67,7 +67,7 @@ struct Model {
             material_p->Get(AI_MATKEY_COLOR_DIFFUSE, color);
             material_p->Get(AI_MATKEY_COLOR_SPECULAR, color);
 
-            // see if this should use a texture
+            // see if this should use a diffuse texture
             if (material_p->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
                 material._texture_contribution = 1.0;
                 // load the texture
