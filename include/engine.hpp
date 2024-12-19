@@ -3,6 +3,7 @@
 #include <glbinding/gl46core/gl.h>
 using namespace gl46core;
 #include <SDL3/SDL_init.h>
+#include <SDL3/SDL_audio.h>
 #include <glm/glm.hpp>
 #include <fmt/base.h>
 #include <imgui.h>
@@ -23,8 +24,8 @@ struct Engine {
         _camera.set_perspective(1280, 720, 70);
 
         // create pipeline for textured objects
-        _pipeline.init("../shaders/default.vert", "../shaders/default.frag");
-        _pipeline_shadows.init("../shaders/shadows.vert", "../shaders/shadows.frag");
+        _pipeline.init("../assets/shaders/default.vert", "../assets/shaders/default.frag");
+        _pipeline_shadows.init("../assets/shaders/shadows.vert", "../assets/shaders/shadows.frag");
         _pipeline_shadows.create_framebuffer();
 
         // create light and its shadow map
@@ -32,12 +33,12 @@ struct Engine {
         _lights[1].init({+3.0, +1.5, +4.0}, {.992, .984, .827}, 100);
 
         // create renderable models
-        _models.emplace_back().init(Mesh::eCube, "../textures/grass.png");
+        _models.emplace_back().init(Mesh::eCube, "../assets/textures/grass.png");
         _models.back()._transform._position = glm::vec3(-3, 0, -5);
         _models.emplace_back().init(Mesh::eSphere);
         _models.back()._transform._position = glm::vec3(+3, 0, -5);
         // load the entire "sponza" scene
-        _models.emplace_back().init("../models/sponza/sponza.obj");
+        _models.emplace_back().init("../assets/models/sponza/sponza.obj");
         _models.back()._transform._scale = glm::vec3(.01, .01, .01);
         // create spheres to represent the lights
         for (auto& light: _lights) {

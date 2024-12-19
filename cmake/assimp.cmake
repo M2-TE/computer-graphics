@@ -14,6 +14,6 @@ FetchContent_Declare(sponza
     GIT_REPOSITORY "https://github.com/jimmiebergmann/Sponza.git"
     GIT_TAG "master"
     GIT_SHALLOW ON
-    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/models/sponza")
+    SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets/models/sponza")
 FetchContent_MakeAvailable(assimp sponza)
 target_link_libraries(${PROJECT_NAME} PRIVATE assimp)
