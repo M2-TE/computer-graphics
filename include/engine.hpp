@@ -46,12 +46,34 @@ struct Engine {
             _models.back()._transform._position = light._position;
         }
 
+        // audio stuff
+        {
+            SDL_InitSubSystem(SDL_INIT_AUDIO);
+            // load .wav file from disk
+            SDL_LoadWAV("../assets/audio/doom.wav", &audio_file.spec, &audio_file.buffer, &audio_file.buffer_size);
+            // create an audio stream for default audio device
+            audio_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr, nullptr, nullptr);
+            if (audio_stream == nullptr) fmt::println("{}", SDL_GetError());
+            // get the format of the device (sample rate and such)
+            SDL_AudioSpec device_format;
+            SDL_GetAudioDeviceFormat(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &device_format, nullptr);
+            // set up the audio stream to convert from our .wav file sample rate to the device's sample rate
+            if(!SDL_SetAudioStreamFormat(audio_stream, &audio_file.spec, &device_format)) fmt::println("{}", SDL_GetError());
+            // load .wav into the audio stream and play
+            if(!SDL_PutAudioStreamData(audio_stream, audio_file.buffer, audio_file.buffer_size)) fmt::println("{}", SDL_GetError());
+            if(!SDL_ResumeAudioStreamDevice(audio_stream)) fmt::println("{}", SDL_GetError());
+        }
+
         // initialize ImGui for UI rendering
         ImGui::CreateContext();
         ImGui_ImplSDL3_InitForOpenGL(_window._window_p, _window._context);
         ImGui_ImplOpenGL3_Init();
     }
     void destroy() {
+        // destroy audio stuff
+        SDL_DestroyAudioStream(audio_stream);
+        SDL_free(audio_file.buffer);
+
         // free OpenGL resources
         for (auto& light: _lights) light.destroy();
         for (auto& model: _models) model.destroy();
@@ -172,4 +194,14 @@ struct Engine {
     // other
     bool _shadows_dirty = true;
     bool _mouse_captured = false;
+    // audio
+    struct AudioFile {
+        void init() {}
+        void destroy() {}
+        SDL_AudioSpec spec;
+        Uint8* buffer;
+        Uint32 buffer_size;
+    };
+    AudioFile audio_file;
+    SDL_AudioStream* audio_stream;
 };
