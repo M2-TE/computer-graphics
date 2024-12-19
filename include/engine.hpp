@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <glbinding/gl46core/gl.h>
 using namespace gl46core;
 #include <SDL3/SDL_init.h>
@@ -27,17 +28,22 @@ struct Engine {
         _pipeline_shadows.create_framebuffer();
 
         // create light and its shadow map
-        _light.init({1.0, 3.0, -0.5}, {.992, .984, .827}, 100);
+        _lights[0].init({+1.0, +3.0, -0.5}, {.992, .984, .827}, 100);
+        _lights[1].init({+3.0, +1.5, +4.0}, {.992, .984, .827}, 100);
 
-        // create the two primitives
-        _cube.init(Mesh::eCube, "../textures/grass.png");
-        _cube._transform._position = glm::vec3(-3, 0, -5);
-        _sphere.init(Mesh::eSphere);
-        _sphere._transform._position = glm::vec3(+3, 0, -5);
-
+        // create renderable models
+        _models.emplace_back().init(Mesh::eCube, "../textures/grass.png");
+        _models.back()._transform._position = glm::vec3(-3, 0, -5);
+        _models.emplace_back().init(Mesh::eSphere);
+        _models.back()._transform._position = glm::vec3(+3, 0, -5);
         // load the entire "sponza" scene
-        _sponza.init("../models/sponza/sponza.obj");
-        _sponza._transform._scale = glm::vec3(.01, .01, .01);
+        _models.emplace_back().init("../models/sponza/sponza.obj");
+        _models.back()._transform._scale = glm::vec3(.01, .01, .01);
+        // create spheres to represent the lights
+        for (auto& light: _lights) {
+            _models.emplace_back().init(Mesh::eSphere);
+            _models.back()._transform._position = light._position;
+        }
 
         // initialize ImGui for UI rendering
         ImGui::CreateContext();
@@ -46,10 +52,8 @@ struct Engine {
     }
     void destroy() {
         // free OpenGL resources
-        _cube.destroy();
-        _sphere.destroy();
-        _sponza.destroy();
-        _light.destroy();
+        for (auto& light: _lights) light.destroy();
+        for (auto& model: _models) model.destroy();
         _pipeline.destroy();
         _window.destroy();
         
@@ -114,22 +118,24 @@ struct Engine {
 
         // handle all the inputs such as camera movement
         execute_input();
-        _cube._transform._rotation += Time::get_delta();
+        _models[0]._transform._rotation += Time::get_delta();
 
         // draw shadows
-        {
-            _pipeline_shadows.bind();
-            glViewport(0, 0, _light._shadow_width, _light._shadow_height);
-            // render into each cubemap face
-            for (int face = 0; face < 6; face++) {
-                // bind the target shadow map and clear it
-                _light.bind_write(_pipeline_shadows._framebuffer, face);
-                glClear(GL_DEPTH_BUFFER_BIT);
-                // draw the stuff
-                _cube.draw(false);
-                _sphere.draw(false);
-                _sponza.draw(false);
+        if (_shadows_dirty) {
+            // do this for each light
+            for (auto& light: _lights) {
+                _pipeline_shadows.bind();
+                glViewport(0, 0, light._shadow_width, light._shadow_height);
+                // render into each cubemap face
+                for (int face = 0; face < 6; face++) {
+                    // bind the target shadow map and clear it
+                    light.bind_write(_pipeline_shadows._framebuffer, face);
+                    glClear(GL_DEPTH_BUFFER_BIT);
+                    // draw the stuff
+                    for (auto& model: _models) model.draw(false);
+                }
             }
+            _shadows_dirty = false;
         }
 
         // draw color
@@ -140,13 +146,13 @@ struct Engine {
             // clear screen before drawing
             glClearColor(0.1, 0.1, 0.1, 0.0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            // bind light and its shadow maps
-            _light.bind_read(1);
+            // bind lights and their shadow maps
+            for (int i = 0; i < _lights.size(); i++) {
+                _lights[i].bind_read(i + 1, i * 3);
+            }
             _camera.bind();
             // draw the stuff
-            _cube.draw();
-            _sphere.draw();
-            _sponza.draw();
+            for (auto& model: _models) model.draw(false);
         }
 
         // present to the screen
@@ -160,10 +166,9 @@ struct Engine {
     Camera _camera;
     Pipeline _pipeline;
     Pipeline _pipeline_shadows;
-    Light _light;
-    Model _cube;
-    Model _sphere;
-    Model _sponza;
+    std::array<Light, 2> _lights;
+    std::vector<Model> _models;
     // other
+    bool _shadows_dirty = true;
     bool _mouse_captured = false;
 };

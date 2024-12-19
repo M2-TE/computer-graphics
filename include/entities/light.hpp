@@ -29,11 +29,11 @@ struct Light {
     void destroy() {
         glDeleteTextures(1, &_shadow_texture);
     }
-    void bind() {
+    void bind(GLuint offset = 0) {
         // bind simple light properties
-        glUniform3f(23, _position.x, _position.y, _position.z);
-        glUniform3f(24, _color.r, _color.g, _color.b);
-        glUniform1f(25, _range);
+        glUniform3f(23 + offset, _position.x, _position.y, _position.z);
+        glUniform3f(24 + offset, _color.r, _color.g, _color.b);
+        glUniform1f(25 + offset, _range);
     }
     void bind_write(GLuint framebuffer, GLuint face_i) {
         bind();
@@ -43,8 +43,8 @@ struct Light {
         glUniformMatrix4fv( 8, 1, false, glm::value_ptr(_shadow_views[face_i]));
         glUniformMatrix4fv(12, 1, false, glm::value_ptr(_shadow_projection));
     }
-    void bind_read(GLuint tex_unit) {
-        bind();
+    void bind_read(GLuint tex_unit, GLuint offset) {
+        bind(offset);
         // bind the entire cube map for reading
         glBindTextureUnit(tex_unit, _shadow_texture);
     }
