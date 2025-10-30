@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.22)
 project(opengl-renderer LANGUAGES CXX)
 
-# use C++23
+# use C++23 and prefer static linking
 set(CMAKE_CXX_STANDARD 23)
+set(BUILD_SHARED_LIBS OFF)
 
 # create executable
 add_executable(${PROJECT_NAME} "src/main.cpp")
