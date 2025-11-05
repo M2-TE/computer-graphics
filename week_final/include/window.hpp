@@ -14,15 +14,15 @@ struct Window {
         if (!res) fmt::println("{}", SDL_GetError());
 
         // OpenGL context settings
-        SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_PROFILE_MASK, SDL_GLprofile::SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-        SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_MINOR_VERSION, 6);
-        SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_DOUBLEBUFFER, 1);
-        SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_CONTEXT_FLAGS, SDL_GLcontextFlag::SDL_GL_CONTEXT_DEBUG_FLAG);
-         // set up multisampling capabilities
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+        // set up multisampling capabilities
         if (sample_count > 1) {
-            SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLEBUFFERS, 1); // enable multisampling
-            SDL_GL_SetAttribute(SDL_GLattr::SDL_GL_MULTISAMPLESAMPLES, sample_count); // set number of samples per pixel
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1); // enable multisampling
+            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, sample_count); // set number of samples per pixel
         }
 
         // create a window specifically with OpenGL support
