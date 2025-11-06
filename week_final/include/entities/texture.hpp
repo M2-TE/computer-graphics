@@ -21,6 +21,10 @@ struct Texture {
         glTextureParameteri(_texture, GL_TEXTURE_WRAP_T, GL_REPEAT); // t is the v coordinate (height)
         glTextureParameteri(_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // interpolation mode when scaling image down
         glTextureParameteri(_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // interpolation mode when scaling image up
+        
+        GLfloat max_anisotropy;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_anisotropy);
+        glTextureParameterf(_texture, GL_TEXTURE_MAX_ANISOTROPY, std::min(max_anisotropy, 16.0f));
         // generate mipmap textures
         glGenerateTextureMipmap(_texture);
     }
