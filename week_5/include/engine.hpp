@@ -1,4 +1,5 @@
 #pragma once
+#include "time.hpp"
 #include "mesh.hpp"
 #include "input.hpp"
 #include "window.hpp"
@@ -9,6 +10,8 @@
 
 struct Engine {
     Engine() {
+        _time.init();
+
         // create render components
         _window.init();
         _pipeline.init("default.vert", "default.frag");
@@ -35,6 +38,7 @@ struct Engine {
         return SDL_AppResult::SDL_APP_CONTINUE;
     }
     auto handle_sdl_frame() -> SDL_AppResult {
+        _time.update();
         // choose color to clear screen with
         if (Keys::down(SDLK_F)) {
             glClearColor(1.0, 0.5, 0.5, 0.0);
@@ -49,7 +53,7 @@ struct Engine {
         _pipeline.bind();
 
         // move via WASDQE
-        float speed = 0.1;
+        float speed = 2.0 * _time._delta; // 0.5 units per second
         if (Keys::down(SDLK_W)) _camera._position.z -= speed;
         if (Keys::down(SDLK_A)) _camera._position.x -= speed;
         if (Keys::down(SDLK_S)) _camera._position.z += speed;
@@ -91,6 +95,7 @@ struct Engine {
         return SDL_AppResult::SDL_APP_CONTINUE;
     }
 
+    Time _time;
     Mesh _mesh;
     Window _window;
     Camera _camera;
