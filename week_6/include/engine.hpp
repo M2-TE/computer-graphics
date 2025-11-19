@@ -14,8 +14,7 @@ struct Engine {
 
         // create render components
         _window.init(1280, 720);
-        _pipeline_textured.init("default.vert", "textured.frag");
-        _pipeline_vertcols.init("default.vert", "vertcols.frag");
+        _pipeline.init("default.vert", "default.frag");
         _texture.init("grass.png");
         _mesh.init();
 
@@ -26,8 +25,7 @@ struct Engine {
         // destroy in reversed init() order
         _mesh.destroy();
         _texture.destroy();
-        _pipeline_vertcols.destroy();
-        _pipeline_textured.destroy();
+        _pipeline.destroy();
         _window.destroy();
     }
 
@@ -74,11 +72,10 @@ struct Engine {
 
         // make the transform spin
         _transform._rotation += 0.5 * _time._delta;
-        _transform._scale = glm::vec3(1.0, 1.0, 1.0) + glm::vec3(1, 1, 1) * float(std::sin(_time._total) * 0.2);
+        _transform._scale = glm::vec3(1, 1, 1) + glm::vec3(1, 1, 1) * float(std::sin(_time._total) * 0.2);
 
-        /// excuting the pipeline for textured drawing
         // bind graphics pipeline containing vertex and fragment shaders
-        _pipeline_textured.bind();
+        _pipeline.bind();
         // bind camera to the pipeline
         _camera.bind();
         // bind and draw mesh
@@ -86,15 +83,14 @@ struct Engine {
         _transform.bind();
         _texture.bind();
         _mesh.bind();
+        glUniform1f(17, 1.0); // draw with texture
         _mesh.draw();
 
-        /// executing the pipeline for vertex color drawing
-        _pipeline_vertcols.bind();
-        _camera.bind();
         _transform._position.x = +2;
         _transform.bind();
         _texture.bind();
         _mesh.bind();
+        glUniform1f(17, 0.0); // draw with vertex colors
         _mesh.draw();
 
         // present drawn image to screen
@@ -109,7 +105,6 @@ struct Engine {
     Window _window;
     Camera _camera;
     Texture _texture;
-    Pipeline _pipeline_textured;
-    Pipeline _pipeline_vertcols;
+    Pipeline _pipeline;
     Transform _transform;
 };

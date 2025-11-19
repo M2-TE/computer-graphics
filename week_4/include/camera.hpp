@@ -25,6 +25,6 @@ struct Camera {
     float _near_plane = 0.1f;  // nearest distance the camera can render
     float _far_plane = 100.0f; // furthest distance the camera can render
     float _fov = 70.0f; // field of view
-    float _width = 720.0f; // should be equal to window width
+    float _width = 1280.0f; // should be equal to window width
     float _height = 720.0f; // should be equal to window height
 };

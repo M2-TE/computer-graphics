@@ -10,7 +10,7 @@
 struct Engine {
     Engine() {
         // create render components
-        _window.init();
+        _window.init(1280, 720);
         _pipeline.init("default.vert", "default.frag");
         _texture.init("grass.png");
         _mesh.init();
